@@ -1,85 +1,101 @@
 // Define variables containing containers
 let lstPending = document.querySelector("#secPending > ul");
 let lstCompleted = document.querySelector("#secCompleted > ul");
-let btnAddTask = document.querySelector("#btnAddTask");
-
+let btnAddTask = document.querySelector("#btnAddTask"); 
+let inputTaskText = document.querySelector("#taskText");
+let inputForm = document.querySelector("form");
+let timeout;
 
 // Event handlers
-btnAddTask.addEventListener("click", createTask);  // Add new task button
-
+btnAddTask.addEventListener("click", (event) => { createTask(event); });  // Add new task button
+inputForm.addEventListener("submit", (event) => { createTask(event); }); // Catering for the user entering a value in the inputTaskText and pressing enter
 
 // Function for creating a new task list item
-function createTask()
+function createTask(event)
 {
-    let inputTaskText = document.querySelector("#taskText");
-    let newTaskText = inputTaskText.value;
+    event.preventDefault();
     
-    // TODO Check that the new Task Text is not empty. Warn user if empty
-    // TODO Check if the element is already existing in the pending list
-    let newTaskElem = document.createElement("li");
+    let newTaskText = inputTaskText.value.trim();
     
-    // TODO replace with fa-icons
+    // != is deliberate vs. !==
+    if (newTaskText != "") {
+
+        // TODO Check if the element is already existing in the pending list
+        // TODO Reset focus on empty after adding
+        let newTaskElem = document.createElement("li");
     
-    /*
-    Task completed checkbox
-    For brevity using the method described in 
-    https://stackoverflow.com/questions/12274748/setting-multiple-attributes-for-an-element-at-once-with-javascript
-    to set multiple element attributes simultaneously */
-    let newTaskChkComplete = document.createElement("input");
-    Object.assign(newTaskChkComplete, {
-        type: "checkbox",
-        name: "chkTaskComplete",
-        title: "Mark task as completed"
-    });
+        // TODO replace with fa-icons
     
-    // Add handler for the checkbox
-    newTaskChkComplete.addEventListener("click", function(element) { relegateToCompleted(element); });
+        /*
+        Task completed checkbox
+        For brevity using the method described in 
+        https://stackoverflow.com/questions/12274748/setting-multiple-attributes-for-an-element-at-once-with-javascript
+        to set multiple element attributes simultaneously */
+        let newTaskChkComplete = document.createElement("input");
+        Object.assign(newTaskChkComplete, {
+            type: "checkbox",
+            name: "chkTaskComplete",
+            title: "Mark task as completed"
+        });
     
-    // Edit task button
-    let newTaskBtnEdit = document.createElement("input");
-    Object.assign(newTaskBtnEdit, {
-        type: "button",
-        name: "btnEditTask",
-        value: "Edit",
-        title: "Edit task details"
-    });
-
-    newTaskBtnEdit.addEventListener("click", (element) => { editTask(element); });
-
-
-    //Delete task button
-    let newTaskBtnDelete = document.createElement("input");
-    Object.assign(newTaskBtnDelete, {
-        type: "button",
-        name: "btnDelTask",
-        value: "Delete",
-        title: "Delete task"
-    });
+        // Add handler for the checkbox
+        newTaskChkComplete.addEventListener("click", function (element) { relegateToCompleted(element); });
     
-    // Add handler for the delete button
-    newTaskBtnDelete.addEventListener("click", (element) => { deleteTask(element); });
+        // Edit task button
+        let newTaskBtnEdit = document.createElement("input");
+        Object.assign(newTaskBtnEdit, {
+            type: "button",
+            name: "btnEditTask",
+            value: "Edit",
+            title: "Edit task details"
+        });
 
-    // Set the task title. TODO Insert into <h2>
-    let newTaskTextElem = document.createElement("h2");
-    newTaskTextElem.textContent = newTaskText;
-    newTaskElem.append(newTaskTextElem);
+        newTaskBtnEdit.addEventListener("click", (element) => { editTask(element); });
 
-    // newTaskElem.textContent = newTaskText;
 
-    /* Useful reference for .prepend/.append/etc methods:
-       https://javascript.info/modifying-document */
-
-    // Add the checkbox
-    newTaskElem.prepend(newTaskChkComplete);
+        //Delete task button
+        let newTaskBtnDelete = document.createElement("input");
+        Object.assign(newTaskBtnDelete, {
+            type: "button",
+            name: "btnDelTask",
+            value: "Delete",
+            title: "Delete task"
+        });
     
-    // Add the edit button to the li element
-    newTaskElem.append(newTaskBtnEdit);
+        // Add handler for the delete button
+        newTaskBtnDelete.addEventListener("click", (element) => { deleteTask(element); });
 
-    // Add the delete button to the li element
-    newTaskElem.append(newTaskBtnDelete);
+        // Set the task title. TODO Insert into <h2>
+        let newTaskTextElem = document.createElement("h2");
+        newTaskTextElem.textContent = newTaskText;
+        newTaskElem.append(newTaskTextElem);
+
+        // newTaskElem.textContent = newTaskText;
+
+        /* Useful reference for .prepend/.append/etc methods:
+           https://javascript.info/modifying-document */
+
+        // Add the checkbox
+        newTaskElem.prepend(newTaskChkComplete);
     
-    // Append the todo item to the pending tasks list
-    lstPending.appendChild(newTaskElem);
+        // Add the edit button to the li element
+        newTaskElem.append(newTaskBtnEdit);
+
+        // Add the delete button to the li element
+        newTaskElem.append(newTaskBtnDelete);
+    
+        // Append the todo item to the pending tasks list
+        lstPending.appendChild(newTaskElem);
+
+        // TODO clear textbox
+        // TODO set focus back to inputTaskText
+        
+    } else {
+        clearTimeout(timeout);
+        document.querySelector("#warningText").textContent = "Empty tasks are not allowed."
+        timeout = setTimeout(() => { document.querySelector("#warningText").textContent = ""; }, 3000);
+    }
+    
 }
 
 // Function that moves the completed item to the completed items list
@@ -117,13 +133,32 @@ function editTask(element)
     Object.assign(newTaskEditor, {
         type: "text",
         name: "txtTaskInplaceEdit",
-        value: currentTaskText.innerHTML
+        value: currentTaskText.innerHTML,
+        title: "Edit the current task description"
     });
 
     // Create an event to handle user changing the block
     newTaskEditor.addEventListener("change", (element) => { processTaskEdit(element); });
 
     // TODO add a button for confirmation of change
+    let currentTaskBtnEditConfirm = document.createElement("input")
+    Object.assign(currentTaskBtnEditConfirm, {
+        type: "button",
+        name: "btnTaskInplaceEditConfirm",
+        value: "Confirm",
+        title: "Confirm changes"
+    });
+
+    currentTaskBtnEditConfirm.addEventListener("change", (element) => { processTaskEdit(element); });
+
+    let currentTaskBtnEditCancel = document.createElement("input")
+    Object.assign(currentTaskBtnEditCancel, {
+        type: "button",
+        name: "btnTaskInplaceEditCancel",
+        value: "Cancel",
+        title: "Discard changes to current task"
+    });
+
     // TODO hide checkbox and edit/delete buttons
 
     currentTaskText.replaceWith(newTaskEditor);
@@ -131,7 +166,7 @@ function editTask(element)
 
 function processTaskEdit(element)
 {
-    let currentTask = element.srcElement.parentElement;
+    // let currentTask = element.srcElement.parentElement;
     let newTaskText = element.srcElement.value;
     let taskEditorElement = element.srcElement;
 
