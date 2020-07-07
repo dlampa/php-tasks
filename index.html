@@ -8,11 +8,53 @@
 
         <link rel="stylesheet" href="css/reset.css" />
         <link rel="stylesheet" href="css/styles.css" />
-        <script src="js/todo.js" defer />
+        <script src="js/todo.js" defer></script>
 
-        <title>Demo to-do app</title>
+        <title>jsTodo</title>
     </head>
     <body>
+        <header>
+            <!-- Let the user know they made it to the world's least useful todo app-->
+            <p>jsTodo</p>
+        </header>
+        <main>
+            <!-- Split into three sections
+            1. Data entry
+            2. Pending items (will treat this section as )
+            3. Active items
+            4. Completed items
+            -->
+            <section id="dataEntry">
+                <!-- Data entry/task creation -->
+                <form>
+                    <!-- Use of different elements based on understanding gained from https://www.w3schools.com/html/html_form_elements.asp -->
+                    <fieldset>
+                        <label for="taskText">Todo:</label>
+                        <input type="checkbox" id="taskComplete" title="Click here to mark as complete.">
+                        <input type="text" id="taskText" name="taskText" title="Enter the task title here" />
+                        <input type="button" id="btnAddTask" name="btnAddTask" value="Add task" title="Click here to add the task to Pending Tasks list.">
+                    </fieldset>
+                </form>
+            </section>
+            <section id="secPending">
+                <!-- Pending tasks - will use as active task list until later commit -->
+                <h1>Pending tasks</h1>
+            </section>
+            <section id="secActive">
+                <!-- Active tasks -->
+                <h1>Active tasks</h1>
+            </section>
+            <section id="secCompleted">
+                <!-- Completed tasks -->
+                <h1>Completed tasks</h1>
+            </section>
+        </main>
+        <footer>
+            <!-- Some features to be added here in the future
+            Ideas: item counters for pending, active and complete items
+            Extra Extra: average time over/under for pending items
+            -->
+        </footer>
     
     </body>
 
