@@ -26,11 +26,7 @@
             -->
             <section id="dataEntry">
                 <!-- Data entry/task creation -->
-                <!-- Fix for the automatic form submission in an HTML 
-                     Reference: https://stackoverflow.com/a/51507806/12802214
-                     Capture the default onsubmit event and do nothing (return false).
-                -->
-                <form post="method"> <!-- method="post" onsubmit="(event) => { createTask(event);">  onsubmit="return false;"> -->
+                <form post="method">
                     <!-- Use of different elements based on understanding gained from https://www.w3schools.com/html/html_form_elements.asp -->
                     <fieldset>
                         <!-- <label for="taskText">Todo:</label>  remove -->

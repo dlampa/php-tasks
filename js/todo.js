@@ -3,6 +3,7 @@ let lstPending = document.querySelector("#secPending > ul");
 let lstCompleted = document.querySelector("#secCompleted > ul");
 let btnAddTask = document.querySelector("#btnAddTask"); 
 
+
 let inputForm = document.querySelector("form");
 let timeout; // require this for error message display
 
@@ -21,10 +22,14 @@ function createTask(event)
     let inputTaskElem = document.querySelector("#taskText");
     let newTaskText = inputTaskElem.value.trim();
 
+    // Extract the list of pending task descriptions (texts) from an HTMLCollection returned by querySelectorAll
+    // Inspired by https://medium.com/@chuckdries/traversing-the-dom-with-filter-map-and-arrow-functions-1417d326d2bc
+    let arrTaskTexts = Array.from(lstPending.querySelectorAll("li h2")).map((element) => element.textContent);
+
     // TODO Check if the element is already existing in the pending list
     
     // != is deliberate, not worried about type comparison
-    if (newTaskText != "") {
+    if (newTaskText != "" && !arrTaskTexts.includes(newTaskText)) {
 
         let newTaskElem = document.createElement("li");
     
@@ -79,6 +84,10 @@ function createTask(event)
 
         newTaskBtnStart.addEventListener("click", (event) => { startTask(event)})
 
+        // Create the element for the creation time. Due to the nature of the time tag, a number of properties are not its own
+        // and Object.assign is not exactly useful.
+        newTaskCDateElem = document.createElement("time");
+
 
         // Set the task title. 
         let newTaskTextElem = document.createElement("h2");
@@ -99,7 +108,20 @@ function createTask(event)
         
         // Add the start button to the li element
         newTaskElem.append(newTaskBtnStart);
-    
+
+        // Add the creation time
+        // Use time tag to contextualize the data - ref https://www.w3schools.com/tags/tag_time.asp
+        let taskCreationTime = document.createElement("time");
+        Object.assign(taskCreationTime, {
+            className: "creationTime",
+            textContent: formatDate(new Date().toISOString()).prettyDate(),
+            title: "Time created"
+        });
+        taskCreationTime.setAttribute("datetime", new Date().toISOString()); // Easier to manipulate later on. Ref https://stackoverflow.com/a/35494888/12802214
+
+        newTaskElem.append(taskCreationTime);
+
+
         // Append the todo item to the pending tasks list
         lstPending.appendChild(newTaskElem);
 
@@ -109,12 +131,13 @@ function createTask(event)
         // Set focus back to inputTaskElem
         inputTaskElem.focus();
         
-    } else {
-        // Use a timeout to delay clearing of the #warningText element
-        // TODO turn into a multiple error handler
-        clearTimeout(timeout);
-        document.querySelector("#warningText").textContent = "Empty tasks are not allowed."
-        timeout = setTimeout(() => { document.querySelector("#warningText").textContent = ""; }, 3000);
+    }
+    else if (newTaskText == "")
+    {
+        displayError("Task description may not be blank.");
+    }
+    else if (arrTaskTexts.includes(newTaskText)) {
+        displayError("A task already exists with the same description, please try again.");
     }
     
 }
@@ -237,10 +260,74 @@ function processTaskEdit(event)
     let taskControls = currentTask.querySelectorAll("[name='chkTaskComplete'], [name='btnStartTask'], [name='btnEditTask'], [name='btnDelTask']");
     taskControls.forEach((element) => { element.classList.remove("hidden"); }); 
     
+    // Use time tag to contextualize the data - ref https://www.w3schools.com/tags/tag_time.asp
+    // A bit of a different approach. If the <time> block with .editTime class does not exist, create it, otherwise assign reference to taskEditTime.
+    let taskEditTime = (currentTask.querySelector("time.editTime") == null) ? document.createElement("time") : currentTask.querySelector(".editTime");
+    Object.assign(taskEditTime, {
+        className: "editTime",
+        textContent: formatDate(new Date().toISOString()).prettyDate(),
+        title: "Time of last edit"
+    });
+    taskEditTime.setAttribute("datetime", new Date().toISOString()); // Easier to manipulate later on. Ref https://stackoverflow.com/a/35494888/12802214
+
+    currentTask.append(taskEditTime);
 
 }
 
 function startTask(event)
 {
+    // TODO - add a start date to the tag
+    // TODO - move to Active tasks
+}
 
+
+function formatDate(date) {
+    // Return a pretty date based on date value
+    // Let's construct a reasonable short date representation in ISO format
+    let currentDateISO = new Date().toISOString().split("T")[0] // Only the date portion for comparison
+
+    if (!isNaN(Date.parse(date))) {
+        /* Create an object containing date and time as properties, and prettyDate as a function that returns 
+           a contextualized date
+           Inspired by an example on https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions
+           section "Invoked through call or apply" */
+        let dateObj = {
+            date: date.split("T")[0],
+            time: date.split("T")[1],
+            dayOfWeek: function () {
+                // Ref http://techfunda.com/howto/823/get-day-name-of-date#:~:text=getDay(),6)%20for%20the%20specified%20date.
+                let weekDays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+                let numDayOfWeek = new Date(this.date).getDay();
+                return (weekDays[numDayOfWeek]);
+            },
+            prettyDate: function (date) {
+                // I need 'this'. I'm sure whoever came up with the arrow fns knew why they decided to exclude 'this'
+                if (currentDateISO == this.date)
+                    // Return today, with time
+                    return "Today at " + this.time.split(".")[0];
+                else if (Math.abs(currentDateISO - this.date) < 7)
+                    // Here we'll return only the full day name together with time. P
+                    return this.dayOfWeek + " at " + this.time;
+                else
+                    // Return date and time in ISO format
+                    return this.date + " " + this.time;
+                    
+            },
+            prettyTime: function () {
+                // Needs seconds removed
+                return this.time.split(".")[0];
+            }
+        }
+        // Return the custom date object
+        return dateObj;
+    } else { return null; }
+}
+
+
+function displayError(errorDesc)
+{
+    // Displays an error message errorDesc for 3 seconds in the #warningText element
+     clearTimeout(timeout);
+     document.querySelector("#warningText").textContent = errorDesc;
+     timeout = setTimeout( () => { document.querySelector("#warningText").textContent = ""; }, 3000);
 }
