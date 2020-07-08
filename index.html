@@ -33,8 +33,8 @@
                 <form post="method"> <!-- method="post" onsubmit="(event) => { createTask(event);">  onsubmit="return false;"> -->
                     <!-- Use of different elements based on understanding gained from https://www.w3schools.com/html/html_form_elements.asp -->
                     <fieldset>
-                        <label for="taskText">Todo:</label>
-                        <input type="text" id="taskText" name="taskText" title="Enter the task title here" />
+                        <!-- <label for="taskText">Todo:</label>  remove -->
+                        <input type="text" id="taskText" name="taskText" title="Enter the task title here" placeholder="Add a task" />
                         <input type="button" id="btnAddTask" name="btnAddTask" value="Add task" title="Click here to add the task to Pending Tasks list.">
                         <br><label id="warningText"></label>
                     </fieldset>
