@@ -1,5 +1,6 @@
 // Define variables containing containers
 let lstPending = document.querySelector("#secPending > ul");
+let lstActive = document.querySelector("#secActive > ul");
 let lstCompleted = document.querySelector("#secCompleted > ul");
 let btnAddTask = document.querySelector("#btnAddTask"); 
 
@@ -114,10 +115,10 @@ function createTask(event)
         let taskCreationTime = document.createElement("time");
         Object.assign(taskCreationTime, {
             className: "creationTime",
-            textContent: formatDate(new Date().toISOString()).prettyDate(),
+            textContent: (new DateHandler()).prettyDate(),
             title: "Time created"
         });
-        taskCreationTime.setAttribute("datetime", new Date().toISOString()); // Easier to manipulate later on. Ref https://stackoverflow.com/a/35494888/12802214
+        taskCreationTime.setAttribute("datetime", (new DateHandler()).dateTime); // Easier to manipulate later on. Ref https://stackoverflow.com/a/35494888/12802214
 
         newTaskElem.append(taskCreationTime);
 
@@ -155,7 +156,8 @@ function relegateToCompleted(event)
     // Acts as a move - see Node Removal section in https://javascript.info/modifying-document
     lstCompleted.append(completedTask);
 
-    // TODO remove edit button
+    // TODO remove edit, start, button
+    // TODO add time of completion
     
 }
 
@@ -265,10 +267,10 @@ function processTaskEdit(event)
     let taskEditTime = (currentTask.querySelector("time.editTime") == null) ? document.createElement("time") : currentTask.querySelector(".editTime");
     Object.assign(taskEditTime, {
         className: "editTime",
-        textContent: formatDate(new Date().toISOString()).prettyDate(),
-        title: "Time of last edit"
+        textContent: (new DateHandler()).prettyDate(),
+        title: "Last edited"
     });
-    taskEditTime.setAttribute("datetime", new Date().toISOString()); // Easier to manipulate later on. Ref https://stackoverflow.com/a/35494888/12802214
+    taskEditTime.setAttribute("datetime", new DateHandler().dateTime); // Easier to manipulate later on. Ref https://stackoverflow.com/a/35494888/12802214
 
     currentTask.append(taskEditTime);
 
@@ -277,12 +279,86 @@ function processTaskEdit(event)
 function startTask(event)
 {
     // TODO - add a start date to the tag
-    // TODO - move to Active tasks
+    // TODO - process
+    // 1. User clicks on start
+    // 2. Start button is removed. 
+    // 3. Checkbox is shown for the task
+    let currentTask = event.srcElement.parentElement;
+
+    let taskStartTime = (currentTask.querySelector("time.startTime") == null) ? document.createElement("time") : currentTask.querySelector(".startTime");
+
+    relegateToActive(event);
+
+
+}
+
+function relegateToActive(event) {
+    let startedTask = event.srcElement.parentElement;
+    // Replaced childNodes with querySelector
+    //let chkCompletedTask = completedTask.querySelector("input[type='checkbox']");
+
+    // Acts as a move - see Node Removal section in https://javascript.info/modifying-document
+    lstActive.append(startedTask);
+
+    // TODO remove edit button
+
+}
+
+/* DateHandler object. Used to process dates and times. Not exactly necessary, but I learned a lot from it
+Inspired by an example on https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions
+section "Invoked through call or apply"  even though no arrow functions were used */
+
+function DateHandler(selDate = new Date()) {
+    // Formatting function for single digit date figures
+    function fmtVal(value) { return ("000" + value).slice(-2); };
+    
+    // Store chosen date as a Date object
+    this.objDate = selDate;
+    
+    // Get date in ISO format, suitable for Date.Parse. Increase value of .getMonth() by 1 because of 0-based indexing !?@>!@#
+    this.ISOdate = this.objDate.getFullYear() + "-" + fmtVal(this.objDate.getMonth() + 1) + "-" + fmtVal(this.objDate.getDate());
+    
+    // Get date in 24h format
+    this.time = fmtVal(this.objDate.getHours()) + ":" + fmtVal(this.objDate.getMinutes());
+    
+    // Get date as unix epoch time
+    this.epochDate = Date.parse(this.objDate);
+    
+    // Get a pretty, parseable date+time string. Useful for creating new DateHandler objects from HTML <time> datetime attribute
+    this.dateTime = this.ISOdate + " " + this.time;
+
+    // Return the name of the weekday
+    this.dayOfWeek = function () {
+        // Ref http://techfunda.com/howto/823/get-day-name-of-date#:~:text=getDay(),6)%20for%20the%20specified%20date.
+        let weekDays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        let numDayOfWeek = new Date(this.objDate).getDay();
+        return (weekDays[numDayOfWeek]);
+    }
+    // Return a nnice version of relative date. Date stored in objDate is compared to current date at midnight
+    this.prettyDate = function () {
+        // Compare this.objDate relative to current date
+        let compDate = Date.parse(new DateHandler(new Date()).ISOdate + " 00:00:00");
+        console.log(compDate);
+
+        if (this.epochDate >= compDate)
+            // If within last 24h
+            return "Today at " + this.time;
+        else if (Math.abs(compDate - this.epochDate) <= 1 * 24 * 3600 * 1000)
+            // If less than 48h ago, then yesterday
+            return "Yesterday at " + this.time;
+        else if (Math.abs(compDate - this.epochDate) < 7 * 24 * 3600 * 1000)
+            // If less than a week ago, then 
+            return this.dayOfWeek() + " at " + this.time;
+        else
+            // Return date and time in ISO format
+            return this.dateTime;
+    }
 }
 
 
+// TODO remove
 function formatDate(date) {
-    // Return a pretty date based on date value
+    // Return a pretty date based on current date and time
     // Let's construct a reasonable short date representation in ISO format
     let currentDateISO = new Date().toISOString().split("T")[0] // Only the date portion for comparison
 
@@ -293,7 +369,7 @@ function formatDate(date) {
            section "Invoked through call or apply" */
         let dateObj = {
             date: date.split("T")[0],
-            time: date.split("T")[1],
+            time: date.split("T")[1], // TODO exclude seconds and milliseconds
             dayOfWeek: function () {
                 // Ref http://techfunda.com/howto/823/get-day-name-of-date#:~:text=getDay(),6)%20for%20the%20specified%20date.
                 let weekDays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -301,10 +377,13 @@ function formatDate(date) {
                 return (weekDays[numDayOfWeek]);
             },
             prettyDate: function (date) {
+                // TODO fix time manipulation
                 // I need 'this'. I'm sure whoever came up with the arrow fns knew why they decided to exclude 'this'
                 if (currentDateISO == this.date)
                     // Return today, with time
                     return "Today at " + this.time.split(".")[0];
+                else if (currentDateISO - this.date < 2)
+                    return "Yesterday at " + this.time.split(".")[0];
                 else if (Math.abs(currentDateISO - this.date) < 7)
                     // Here we'll return only the full day name together with time. P
                     return this.dayOfWeek + " at " + this.time;
