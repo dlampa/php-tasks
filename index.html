@@ -30,8 +30,9 @@
                     <!-- Use of different elements based on understanding gained from https://www.w3schools.com/html/html_form_elements.asp -->
                     <fieldset>
                         <!-- <label for="taskText">Todo:</label>  remove -->
-                        <input type="text" id="taskText" name="taskText" title="Enter the task title here" placeholder="Add a task" />
-                        <input type="button" id="btnAddTask" name="btnAddTask" value="Add task" title="Click here to add the task to Pending Tasks list.">
+                        <input type="text" id="taskText" name="taskText" title="Enter the task description here" placeholder="Add a task" />
+                        <input type="number" id="taskEstDur" name="taskEstDur" min="0" max="10" step="0.25" placeholder="Estimate duration" title="Your estimate of the task duration"/>
+                        <input type="button" id="btnAddTask" name="btnAddTask" value="Add task" title="Click here to add the task to the Pending Tasks list.">
                         <br><label id="warningText"></label>
                     </fieldset>
                 </form>

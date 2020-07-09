@@ -44,6 +44,7 @@ function createTask(event)
         let newTaskChkComplete = document.createElement("input");
         Object.assign(newTaskChkComplete, {
             type: "checkbox",
+            className: "hidden",
             name: "chkTaskComplete",
             title: "Mark task as completed"
         });
@@ -148,7 +149,7 @@ function relegateToCompleted(event)
 {
     let completedTask = event.srcElement.parentElement;
     // Replaced childNodes with querySelector
-    let chkCompletedTask = completedTask.querySelector("input[type='checkbox']");
+    let chkCompletedTask = completedTask.querySelector("[name='chkTaskComplete']");
 
     // https://www.w3schools.com/jsref/prop_checkbox_disabled.asp
     chkCompletedTask.disabled = true;
@@ -156,9 +157,22 @@ function relegateToCompleted(event)
     // Acts as a move - see Node Removal section in https://javascript.info/modifying-document
     lstCompleted.append(completedTask);
 
-    // TODO remove edit, start, button
-    // TODO add time of completion
-    
+    // TODO calculate how long it took to perform a task
+    let taskComplTime = document.createElement("time");
+    Object.assign(taskComplTime, {
+        className: "complTime",
+        textContent: (new DateHandler()).prettyDate(),
+        title: "Task completed"
+    });
+    //taskEditTime.setAttribute("datetime", new DateHandler().dateTime); // Easier to manipulate later on. Ref https://stackoverflow.com/a/35494888/12802214
+
+    // Get the value for time the task was started
+    let taskStartTime = completedTask.querySelector("time.startTime").getAttribute("datetime");
+    let timeDiff = (new DateHandler(new Date(taskStartTime))).timeToPresent();
+
+    console.log(taskStartTime, timeDiff);
+
+    //currentTask.append(taskEditTime);
 }
 
 // Function that deletes the task
@@ -237,6 +251,7 @@ function editTask(event)
     currentTask.append(currentTaskBtnEditCancel);
 
     // TODO hide checkbox and edit/delete buttons
+    // TODO set focus onto the newTaskEditor
 
     currentTaskTextElem.replaceWith(newTaskEditor);
 }
@@ -259,7 +274,7 @@ function processTaskEdit(event)
     taskEditorBtns.forEach(element => { element.remove(element); });
     
     // Restore task controls on completion of editing
-    let taskControls = currentTask.querySelectorAll("[name='chkTaskComplete'], [name='btnStartTask'], [name='btnEditTask'], [name='btnDelTask']");
+    let taskControls = currentTask.querySelectorAll("[name='btnStartTask'], [name='btnEditTask'], [name='btnDelTask']");
     taskControls.forEach((element) => { element.classList.remove("hidden"); }); 
     
     // Use time tag to contextualize the data - ref https://www.w3schools.com/tags/tag_time.asp
@@ -278,31 +293,33 @@ function processTaskEdit(event)
 
 function startTask(event)
 {
-    // TODO - add a start date to the tag
-    // TODO - process
-    // 1. User clicks on start
-    // 2. Start button is removed. 
-    // 3. Checkbox is shown for the task
     let currentTask = event.srcElement.parentElement;
+    
+    // Show the checkbox, allowing the user to complete the task
+    currentTask.querySelector("[name='chkTaskComplete']").classList.remove("hidden");
 
+    // Create an entry for task completion time
     let taskStartTime = (currentTask.querySelector("time.startTime") == null) ? document.createElement("time") : currentTask.querySelector(".startTime");
+    Object.assign(taskStartTime, {
+        className: "startTime",
+        textContent: (new DateHandler()).prettyDate(),
+        title: "Start time"
+    });
 
-    relegateToActive(event);
+    taskStartTime.setAttribute("datetime", new DateHandler().dateTime);
+
+    currentTask.append(taskStartTime);
+    //relegateToActive(event);
+    
+    // Remove task controls on completion of editing
+    let taskControls = currentTask.querySelectorAll("[name='btnStartTask'], [name='btnEditTask']");
+    taskControls.forEach(element => { element.remove(element); });
+
+    lstActive.append(currentTask);
 
 
 }
 
-function relegateToActive(event) {
-    let startedTask = event.srcElement.parentElement;
-    // Replaced childNodes with querySelector
-    //let chkCompletedTask = completedTask.querySelector("input[type='checkbox']");
-
-    // Acts as a move - see Node Removal section in https://javascript.info/modifying-document
-    lstActive.append(startedTask);
-
-    // TODO remove edit button
-
-}
 
 /* DateHandler object. Used to process dates and times. Not exactly necessary, but I learned a lot from it
 Inspired by an example on https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions
@@ -322,10 +339,18 @@ function DateHandler(selDate = new Date()) {
     this.time = fmtVal(this.objDate.getHours()) + ":" + fmtVal(this.objDate.getMinutes());
     
     // Get date as unix epoch time
-    this.epochDate = Date.parse(this.objDate);
+    this.epochTime = Date.parse(this.objDate);
     
     // Get a pretty, parseable date+time string. Useful for creating new DateHandler objects from HTML <time> datetime attribute
     this.dateTime = this.ISOdate + " " + this.time;
+
+    // Get a time difference between the objDate and current time, return value in seconds (from milliseconds)
+    this.timeToPresent = function () {
+        // Compare this.objDate to current date and return the difference
+        let compDate = new DateHandler(new Date()).epochTime;
+        return (compDate - this.epochTime) / 1000;
+
+    }
 
     // Return the name of the weekday
     this.dayOfWeek = function () {
@@ -338,15 +363,14 @@ function DateHandler(selDate = new Date()) {
     this.prettyDate = function () {
         // Compare this.objDate relative to current date
         let compDate = Date.parse(new DateHandler(new Date()).ISOdate + " 00:00:00");
-        console.log(compDate);
 
-        if (this.epochDate >= compDate)
+        if (this.epochTime >= compDate)
             // If within last 24h
             return "Today at " + this.time;
-        else if (Math.abs(compDate - this.epochDate) <= 1 * 24 * 3600 * 1000)
+        else if (Math.abs(compDate - this.epochTime) <= 1 * 24 * 3600 * 1000)
             // If less than 48h ago, then yesterday
             return "Yesterday at " + this.time;
-        else if (Math.abs(compDate - this.epochDate) < 7 * 24 * 3600 * 1000)
+        else if (Math.abs(compDate - this.epochTime) < 7 * 24 * 3600 * 1000)
             // If less than a week ago, then 
             return this.dayOfWeek() + " at " + this.time;
         else
