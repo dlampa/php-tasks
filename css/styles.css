@@ -44,8 +44,9 @@ main > section > h1 {
     padding: 10px;
 }
 
-/* Individual tasks */
-/* Task containers */
+
+
+/* Task containers (Pending, Active, Completed headers) */
 main section ul {
     display: flex;
     flex-direction: column;
@@ -53,7 +54,8 @@ main section ul {
     align-content: flex-start;
 }
 
-main section ul li {
+/* Individual tasks */
+section ul li {
     display: flex;
     flex-flow: row wrap;
     align-content: stretch;
@@ -61,13 +63,26 @@ main section ul li {
     margin: 5px 0;
 }
 
+/* Based on Slack discussion with James Grieve, July 10 13:30. Thanks James! 
+   Increase the margin for the last item in the task container */
+section ul li:last-of-type {
+    margin: 5px 0 10px 0;
+}
+
+/* "Glue" the first task in the container with the container heading
+   Order of last-of-type (above) and first-of-type (below) is important */  
+section ul li:first-of-type {
+    margin: 0 0 5px 0;
+}
+
+/* Task text */
 li h2 {
     flex: 1 0;
     margin: 2px 10px 10px 0;
 }
 
-/* Time elements in the timeContainer, excl. the last one */
-time:not(:last-of-type) {
+/* Time elements in the timeContainer inside the task <li>, all excl. the last one */
+time:not(:first-of-type) {
     padding: 0 15px 0 0;
 }
 
@@ -100,14 +115,19 @@ time:not(:last-of-type) {
 #timeContainer {
     display: flex;
     flex-direction: row;
-    align-content: flex-start;
+    justify-content: flex-start;
+    align-items: center;
     flex: 1 0 100%; /* Occupy an entire row */
 }
 
-#timeContainer time {
+time {
     margin: 0 15px 0 0;
 }
 
 .hidden {
     display: none;
+}
+
+.creationTime:before, .taskDurEstimate:before, .complTime:before, .startTime:before {
+    margin: 0 4px 0 0;
 }

@@ -48,19 +48,26 @@ button {
     font-weight: 400;
 }
 
+#timeContainer time:before {
+     font-family: FontAwesome;
+}
 
 .creationTime:before {
     font-family: FontAwesome;
-    content: "\f477";
-    margin: 0 4px 0 0;
+    content: "\f067";
 }
 
 .taskDurEstimate:before {
     font-family: FontAwesome;
-    content: "\f0d0";
+    content: "\f059";
+}
+
+.startTime:before {
+    font-family: FontAwesome;
+    content: "\f135";
 }
 
 .complTime:before {
     font-family: FontAwesome;
-    content: "\f11e";
+    content: "\f00c";
 }
