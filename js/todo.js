@@ -52,22 +52,20 @@ function createTask(event)
         newTaskChkComplete.addEventListener("click", (event) => { relegateToCompleted(event); });
     
         // Edit task button
-        let newTaskBtnEdit = document.createElement("input");
+        let newTaskBtnEdit = document.createElement("button");
         Object.assign(newTaskBtnEdit, {
-            type: "button",
             name: "btnEditTask",
-            value: "Edit",
+            innerHTML: "<i class=\"fas fa-edit\"></i>",
             title: "Edit task details"
         });
 
         newTaskBtnEdit.addEventListener("click", (event) => { editTask(event); });
 
         //Delete task button
-        let newTaskBtnDelete = document.createElement("input");
+        let newTaskBtnDelete = document.createElement("button");
         Object.assign(newTaskBtnDelete, {
-            type: "button",
             name: "btnDelTask",
-            value: "Delete",
+            innerHTML: "<i class=\"far fa-trash-alt\"></i>",
             title: "Delete task"
         });
     
@@ -75,11 +73,10 @@ function createTask(event)
         newTaskBtnDelete.addEventListener("click", (event) => { deleteTask(event); });
 
         // Start task button
-        let newTaskBtnStart = document.createElement("input");
+        let newTaskBtnStart = document.createElement("button");
         Object.assign(newTaskBtnStart, {
-            type: "button",
             name: "btnStartTask",
-            value: "Start",
+            innerHTML: "<i class=\"fas fa-play-circle\"></i>",
             title: "Start the task"
         });
 
@@ -219,7 +216,7 @@ function relegateToCompleted(event)
         textContent: (new DateHandler()).prettyDate(),
         title: "Task completed"
     });
-    
+
     //taskEditTime.setAttribute("datetime", new DateHandler().dateTime); // Easier to manipulate later on. Ref https://stackoverflow.com/a/35494888/12802214
 
 
@@ -374,9 +371,9 @@ function processTaskEdit(event)
 
 function startTask(event)
 {
-    let currentTask = event.srcElement.parentElement;
+    let currentTask = event.srcElement.parentElement.parentElement;
     let taskTimeDiv = currentTask.querySelector("#timeContainer");
-
+    console.log(event);
     // Show the checkbox, allowing the user to complete the task
     currentTask.querySelector("[name='chkTaskComplete']").classList.remove("hidden");
 

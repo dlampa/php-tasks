@@ -1,0 +1,66 @@
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Dancing+Script:wght@700&family=Roboto:wght@100;300;400;700;900&display=swap');
+
+/* Fonts, font sizes and font styles */
+html {
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Site logo in header */
+header p {
+    font-family: 'Dancing Script', sans-serif;
+    font-size: xx-large;
+    font-weight: 700;
+}
+
+input {
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Section titles */
+main > section > h1 {
+    font-weight: 700;
+}
+
+button {
+    font-size: larger;
+}
+
+/* Placeholder font size - TODO remove for desktop css. Ref in colours.css */
+.textEntry::placeholder { /* Chromium, Firefox, Webkit */
+    font-size: smaller;
+}
+
+.textEntry:-ms-input-placeholder { /* IE */
+    font-size: smaller;
+}
+
+.textEntry::-ms-input-placeholder { /* Edge */
+    font-size: smaller;
+}
+
+
+#timeContainer {
+    font-size: small;
+}
+
+#warningText {
+    font-size: smaller;
+    font-weight: 400;
+}
+
+
+.creationTime:before {
+    font-family: FontAwesome;
+    content: "\f477";
+    margin: 0 4px 0 0;
+}
+
+.taskDurEstimate:before {
+    font-family: FontAwesome;
+    content: "\f0d0";
+}
+
+.complTime:before {
+    font-family: FontAwesome;
+    content: "\f11e";
+}
