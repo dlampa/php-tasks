@@ -1,73 +1,107 @@
-@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Dancing+Script:wght@700&family=Roboto:wght@100;300;400;700;900&display=swap');
+/* Wanted to use a classic, readable typeface for all elements on the page
+   with the exception of the app title, which I wanted to make somewhat fancier.
+   All fonts sourced from Google.
+
+   All font sizes have been specified using keywords. This is better from 
+*/
+
+@import url("https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Dancing+Script:wght@700&family=Roboto:wght@100;300;400;700;900&display=swap");
 
 /* Fonts, font sizes and font styles */
 html {
-    font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
 }
 
 /* Site logo in header */
 header p {
-    font-family: 'Dancing Script', sans-serif;
-    font-size: xx-large;
-    font-weight: 700;
+  font-family: "Dancing Script", sans-serif;
+  font-size: xx-large;
+  font-weight: 700;
 }
 
 input {
-    font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
 }
 
 /* Section titles */
 main > section > h1 {
-    font-weight: 700;
+  font-weight: 700;
 }
 
 button {
-    font-size: larger;
+  font-size: larger;
+}
+
+/* Buttons inside the task containers */
+li button {
+  font-size: medium;
 }
 
 /* Placeholder font size - TODO remove for desktop css. Ref in colours.css */
-.textEntry::placeholder { /* Chromium, Firefox, Webkit */
-    font-size: smaller;
+.textEntry::placeholder {
+  /* Chromium, Firefox, Webkit */
+  font-size: smaller;
 }
 
-.textEntry:-ms-input-placeholder { /* IE */
-    font-size: smaller;
+.textEntry:-ms-input-placeholder {
+  /* IE */
+  font-size: smaller;
 }
 
-.textEntry::-ms-input-placeholder { /* Edge */
-    font-size: smaller;
+.textEntry::-ms-input-placeholder {
+  /* Edge */
+  font-size: smaller;
 }
 
-
-#timeContainer {
-    font-size: small;
+#taskEstDur.textEntry::placeholder {
+  font-family: FontAwesome;
+  content: "\f067";
 }
 
-#warningText {
-    font-size: smaller;
-    font-weight: 400;
+/* Task completion labels */
+/* Common */
+.taskStatus {
+  font-size: small;
+  text-align: center;
 }
 
-#timeContainer time:before {
-     font-family: FontAwesome;
+.taskStatus :first-child {
+  font-variant: small-caps;
+  font-weight: 300;
 }
+
+/* Icons before the time elements for descriptive purposes */
+/* Common */
+.timeContainer time:before {
+  font-family: FontAwesome;
+}
+
+.timeContainer {
+  font-size: small;
+}
+
 
 .creationTime:before {
-    font-family: FontAwesome;
-    content: "\f067";
+  content: "\f067";
 }
 
 .taskDurEstimate:before {
-    font-family: FontAwesome;
-    content: "\f059";
+  content: "\f059";
 }
 
 .startTime:before {
-    font-family: FontAwesome;
-    content: "\f135";
+  content: "\f135";
 }
 
 .complTime:before {
-    font-family: FontAwesome;
-    content: "\f00c";
+  content: "\f00c";
+}
+
+.editTime:before {
+  content: "\f4ff";
+}
+
+.warningElement {
+  font-size: smaller;
+  font-weight: 400;
 }

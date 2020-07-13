@@ -4,65 +4,86 @@
                   #C1C9D9 (light gray)
                   #0396A6 (teal)
                   #025159 (dark teal)
-                  #0D0D0D (black)
+                  #0D0D0D ("signature" black)
+
+  Some of the colours were slightly edited from the values above to improve contrast.
+  Colours were specified in rgb/rgba pairs as necessary to cater for browser quirks (IE, Edge mostly)
   
   General notes
   Where transparent colour definitions (rgba) were used, additional rgb definition was also provided 
   for browsers that do not understand rgba (mostly Edge/IE). 
-
+  I tried using generic element selectors as far as practical and wanted to use element IDs in JS.
 
 */
+
+/* Body element, with various background styles 
+   https://www.w3schools.com/cssref/pr_background-attachment.asp */
 
 body {
     background-color: rgba(0,0,0,0.25);
     /* Taken from unsplash.com:  */
     background-image: url("/img/andy-holmes-unsplash2400.jpg");  
+    background-repeat: no-repeat;
     background-position-x: center;
     background-position-y: top;
-    background-blend-mode: darken;
-    
+    background-blend-mode: darken; /* Blends the background color with background-image */
+    background-attachment: fixed;
 }
 
+/* Header with app logo */
 header {
-    color: #0D0D0D;
+    color: rgb(13, 13, 13);
 }
 
-main section {
+/* General for all section elements */
+section {
     background-color: transparent;
-    border-radius: 4px;
+    border-radius: 6px;
 }
 
-main section h1 {
+/* Data entry bar */
+section:first-of-type {
+    background-color: rgb(143, 150, 166);
+    background-color: rgba(143, 150, 166, 0.9);
+}
+
+/* Titles for different sections (pending, active, completed */
+section h1 {
     background-color: rgb(143, 150, 166);
     background-color: rgba(143, 150, 166, 0.9);
     border-radius: 6px 6px 0 0;
 }
 
-main section ul li:first-of-type {
+/* Normally individual task items have rounded borders, except first in line, which is attached to the heading
+   and has only the bottom l/r borders rounded */
+section ul li:first-of-type {
     border-radius: 0 0 6px 6px;
 }
 
-main section ul {
-    background-color: transparent;
-}
-
 /* Individual task containers */
-main section ul li {
+section ul li {
     border-radius: 4px;
-    background-blend-mode: lighten;
     background-color: rgb(193, 201, 217);
     background-color: rgba(203, 211, 227, 0.9)
 }
 
+/* Background for task list sections */
+section ul {
+    background-color: transparent;
+}
+
+/* Text inside the task item - want it to be able to break if line length exceeds available container width */
 li h2 {
     overflow-wrap: anywhere; /* Break lines that are too long */
 }
 
+/* Checkbox */
 li input[type="checkbox"] {
     align-self: center;
     margin: 2px 10px 10px 0;
 }
 
+/* All buttons in general should have no border and a transparent background */
 button {
     border: none;
     background-color: transparent;
@@ -70,34 +91,26 @@ button {
 
 /* Buttons inside the task containers */
 li button {
-    margin-right: 5px;
-    width: 32px;
-    height: 32px;
-    /* padding: 10px; */
     border-radius: 4px;
-
+    color: rgb(13, 13, 13);
 }
 
+/* Change the color of the button on hover */
 li button:hover {
     background-color: rgba(0, 0, 0, 0.3);
 }
 
-/* Font-Awesome glyph inside a task container button */
-li button i {
-    /* color: rgb(193, 201, 217); */
-    color: rgb(13, 13, 13);
-    font-size: medium;
+/* Add a > glyph after all time elements, except the last one. */
+time:not(:last-of-type):after {
+    font-family: FontAwesome;
+    content: "\f105";
 }
 
-
-main section ul li button {
-    color: rgb(143, 150, 166);
+.warningElement {
+    color: #025159;
 }
 
-#dataEntry button, #dataEntry label:first-child {
-    color: rgb(193, 201, 217);
-}
-
+/* Various text boxes share this class */
 .textEntry {
     background-color: transparent;
     border: none;
@@ -106,7 +119,6 @@ main section ul li button {
 
 /* Text box placeholder color
 /* https://www.w3schools.com/howto/howto_css_placeholder.asp */
-
 .textEntry::placeholder { /* Chromium, Firefox, Webkit */
     color: rgb(193, 201, 217);
 }
@@ -119,17 +131,24 @@ main section ul li button {
     color: rgb(193, 201, 217);
 }
 
-
-#dataEntry {
-    background-color: rgb(143, 150, 166);
-    background-color: rgba(143, 150, 166, 0.75);
+/* Task completion labels */
+/* Common */
+.taskStatus :first-child {
+    color: white; /* Departure to improve contrast and readability */
+    border-radius: 3px;
 }
 
-#warningText {
-    color: #025159;
+/* "Early" */
+.early {
+    background-color: goldenrod;
 }
 
-time:not(:first-of-type) {
-    border-left: 1px solid black; 
-    padding: 0 15px 0 15px;
+/* On-time */
+.ontime {
+    background-color: green;
+}
+
+.late {
+    /* Late */
+    background-color: darkred;
 }

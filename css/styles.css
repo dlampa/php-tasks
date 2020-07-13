@@ -1,3 +1,10 @@
+/* Mobile first layout. File contains all attributes that contribute to the element/page layout,
+   effective element width and height.
+*/
+
+/* Change the way height and width are calculated to include padding and borders
+   https://www.w3schools.com/css/css3_box-sizing.asp */
+
 * {
     box-sizing: border-box;
 }
@@ -7,15 +14,16 @@ html {
     padding: 15px;
 }
 
+body {
+    width: 100%;
+}
+
 /* Header, incl logo */
 header {
-    padding: 0 0 5px 0;
-    margin: 0 0 20px 0;
+    margin: 0 0 25px 0;
     display: flex;
-    flex-wrap: false;
+    flex-flow: row nowrap;
     justify-content: center;
-    align-content: center;
-    align-items: center;
 }
 
 /* Main interface */
@@ -25,26 +33,47 @@ main {
     align-items: stretch;
 }
 
+/* Common to all sections */
 main section {
     margin: 5px 0;
 }
 
-
-/* Task input form - input and div elements. Do not select input inside div */
-#dataEntry input:first-child, #dataEntry div { 
-    margin: 0 15px 0 0;
+/* The input section */
+section:first-of-type {
+       margin: 0 0 10px 0; 
 }
 
-#dataEntry input:first-child {
-    flex: auto;
+/* Task entry form container */
+form {
+    padding: 10px;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: stretch;
+}
+
+/* Task input element common */
+form input { 
+    margin: 0 15px 0 0;
+    width: 0;
+}
+
+/* Task description input element only [input type="text"] */
+form input:first-child {
+    min-width: 150px;
+    flex: 2 0 auto; 
+}
+
+/* Task duration element estimate only [input type="number"] */
+form input:nth-child(2) {
+    min-width: 20px;
+    max-width: 50px;
+    flex: 1 1 ;
 }
 
 /* Section titles */
-main > section > h1 {
+section h1 {
     padding: 10px;
 }
-
-
 
 /* Task containers (Pending, Active, Completed headers) */
 main section ul {
@@ -81,53 +110,133 @@ li h2 {
     margin: 2px 10px 10px 0;
 }
 
-/* Time elements in the timeContainer inside the task <li>, all excl. the last one */
-time:not(:first-of-type) {
-    padding: 0 15px 0 0;
+/* Button controls inside task items */
+li button {
+    align-self: flex-end;
+    margin-right: 5px;
+    width: 32px;
+    height: 32px;
 }
 
-
-#dataEntry {
-    margin: 0 0 10px 0;
-}
-
-/* Task entry */
-#dataEntry form {
-    padding: 10px;
+/* Time element. Each time element is a container for time as well as the glyph 
+   (specified by :before selector in fonts.css */
+time {
+    margin: 5px 7px 0 7px;
     display: flex;
-    flex-flow: row wrap;
-    justify-content: space-between;
-    
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+}
+
+time:not(:last-of-type):after {
+    padding-left: 10px;
+}
+
+
+/* In-place edit control for the selected task, required due to the nature of the input element */
+input[name="txtTaskInplaceEdit"] {
+    flex: 1 0 auto;
 }
 
 /* Warning display under the text entry */
-#warningText {
+.warningElement {
     padding: 10px 0 0 5px;
     flex: 1 0 100%; /* Force the label into a new row */
     align-self: flex-end;
-
 }
-
-#warningText:empty {
+/* Hide element if empty */
+.warningElement:empty {
     display: none;
 }
 
-#timeContainer {
+.timeContainer {
     display: flex;
-    flex-direction: row;
+    flex-flow: row wrap;
     justify-content: flex-start;
     align-items: center;
     flex: 1 0 100%; /* Occupy an entire row */
-}
-
-time {
-    margin: 0 15px 0 0;
+    margin: 10px 0 0 0;
 }
 
 .hidden {
-    display: none;
+    display: none !important; /* Unfortunately, this one is !important */
 }
 
-.creationTime:before, .taskDurEstimate:before, .complTime:before, .startTime:before {
-    margin: 0 4px 0 0;
+.creationTime:before, .taskDurEstimate:before, .complTime:before, .startTime:before, .editTime:before {
+    margin: 0 10px 0 0;
+}
+
+/* Task completion labels */
+/* Common */
+.taskStatus {
+    padding: 3px;
+}
+/* Status label */
+.taskStatus :first-child {
+    padding: 0 10px;
+}
+
+/* Custom scrollbar controls
+   Adapted from https://www.w3schools.com/howto/howto_css_custom_scrollbar.asp 
+   Works only on non-MS browsers (but includes Chromium based Edge) */
+
+::-webkit-scrollbar {
+    width: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+}
+
+::-webkit-scrollbar-track {
+    background: #b5b5b500;
+}
+
+
+
+
+/* Switch to desktop at screen width >= 1200px */
+
+@Media (min-width: 1200px) {
+    
+    header {
+        margin: 5px 0 45px 0;
+    }
+    
+    /* Opted for grid in desktop layout */
+    main {
+        display: grid;
+        grid-template-areas: ". input ." "pending active completed";
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-rows: 50px auto;
+        row-gap: 20px;
+    }
+    
+    /* Stretch all sections in their respective grids */
+    section {
+        justify-self: stretch;
+    }
+    
+    /* Grid assignments */
+    /* Margins between elements also differ in this configuration */
+    section:first-of-type {
+        grid-area: input;
+    }
+    
+    section:nth-of-type(2) {
+        grid-area: pending;
+        margin: 5px 5px 5px 0;
+    }
+    
+    section:nth-of-type(3) {
+        grid-area: active;
+        margin: 5px;
+    }
+    
+    section:nth-of-type(4) {
+        grid-area: completed;
+        margin: 5px 0 5px 5px;
+    }
+
+    
 }

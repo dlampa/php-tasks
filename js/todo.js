@@ -1,16 +1,18 @@
+/* Welcome to jsTask!
+   A non-persistent task manager written in JS!
+*/
+
 // Define variables containing containers
 let lstPending = document.querySelector("#secPending > ul");
 let lstActive = document.querySelector("#secActive > ul");
 let lstCompleted = document.querySelector("#secCompleted > ul");
 let btnAddTask = document.querySelector("#btnAddTask"); 
-
-
 let inputForm = document.querySelector("form");
-let timeout; // require this for error message display
+let timeout; // require this for error message display (see fn displayError)
 
-// Event handlers
-// General ref about event handlers: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
-// Arrow functions https://javascript.info/arrow-functions-basics
+/* Event handlers
+   General ref about event handlers: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
+   Arrow functions https://javascript.info/arrow-functions-basics */
 btnAddTask.addEventListener("click", (event) => { createTask(event); }); // Add new task button click event
 inputForm.addEventListener("submit", (event) => { createTask(event); }); // Catering for the user entering a value in the inputTaskText and pressing enter
 
@@ -33,8 +35,6 @@ function createTask(event)
 
         let newTaskElem = document.createElement("li");
     
-        // TODO replace with fa-icons
-    
         /*
         Task completed checkbox
         For brevity using the method described in 
@@ -55,7 +55,7 @@ function createTask(event)
         let newTaskBtnEdit = document.createElement("button");
         Object.assign(newTaskBtnEdit, {
             name: "btnEditTask",
-            innerHTML: "<i class=\"fas fa-edit\"></i>",
+            classList: "far fa-edit",
             title: "Edit task details"
         });
 
@@ -65,7 +65,7 @@ function createTask(event)
         let newTaskBtnDelete = document.createElement("button");
         Object.assign(newTaskBtnDelete, {
             name: "btnDelTask",
-            innerHTML: "<i class=\"far fa-trash-alt\"></i>",
+            classList: "far fa-trash-alt",
             title: "Delete task"
         });
     
@@ -76,7 +76,7 @@ function createTask(event)
         let newTaskBtnStart = document.createElement("button");
         Object.assign(newTaskBtnStart, {
             name: "btnStartTask",
-            innerHTML: "<i class=\"fas fa-play-circle\"></i>",
+            classList: "fas fa-running",
             title: "Start the task"
         });
 
@@ -91,7 +91,7 @@ function createTask(event)
         newTaskTextElem.textContent = newTaskText;
         newTaskElem.append(newTaskTextElem);
 
-        /* Useful reference for .prepend/.append/etc methods:
+        /* Useful reference for .prepend/.append/before/after/etc methods:
            https://javascript.info/modifying-document */
 
         // Add the checkbox
@@ -99,26 +99,26 @@ function createTask(event)
     
         // Add the edit button to the li element
         newTaskElem.append(newTaskBtnEdit);
-
+        
         // Add the delete button to the li element
         newTaskElem.append(newTaskBtnDelete);
         
         // Add the start button to the li element
         newTaskElem.append(newTaskBtnStart);
-
+        
         // Create a container for all the time data
         let taskTimeDiv = document.createElement("div");
         Object.assign(taskTimeDiv, {
-            id: "timeContainer"
+            className: "timeContainer"
         });
-
+        
         // Add an element to show state of the task (early/late/ontime). Hidden initially
         // Deliberately written out in this way in case changes are made in the future
         let taskStatusPanel = document.createElement("aside");
         Object.assign(taskStatusPanel, {
             className: "taskStatus hidden"
         })
-
+        
         // The label indicating "Early"/"Late"/"On time"
         let statusSummary = document.createElement("p");
         Object.assign(statusSummary, {
@@ -135,8 +135,8 @@ function createTask(event)
         taskStatusPanel.append(statusSummary); 
         taskStatusPanel.append(statusTime);
         
-        taskTimeDiv.append(taskStatusPanel); 
-        
+        newTaskBtnEdit.before(taskStatusPanel);
+
         // Add the creation time
         // Use time tag to contextualize the data - ref https://www.w3schools.com/tags/tag_time.asp
         let taskCreationTime = document.createElement("time");
@@ -149,34 +149,46 @@ function createTask(event)
         taskCreationTime.setAttribute("datetime", (new DateHandler()).dateTime); // Easier to manipulate later on. Ref https://stackoverflow.com/a/35494888/12802214
 
         taskTimeDiv.append(taskCreationTime);
+ 
+        // Only add the duration estimate into the HTML if the user provided the information otherwise ignore
+        if (inputTaskEstDur.value != "") {
+            // Abs to cater for negative values.
+            // Rounding off to nearest 0.25 based on answer at https://stackoverflow.com/a/35639264/12802214
+            // Essentially, take the number, divide by 0.25, round up to the next nearest integer, multiply by 0.25 again
+            // Ex. 4.333 will be rounded off to 4.5 as follows: (4.333/0.25) = 17.332 => Math.ceil() = 18 * 0.25 = 4.5 
+            let taskEstDurCorr = Math.ceil(Math.abs(inputTaskEstDur.value) / 0.25) * 0.25;
 
-        // Add the user's estimate of the time taken. A little difficult to read, but I wanted to try it out
-        let taskDurationEstPretty = (inputTaskEstDur.value < 1) ? 60 * inputTaskEstDur.value + "min" :
-            parseInt(inputTaskEstDur.value) + "h " +
-            (((inputTaskEstDur.value - parseInt(inputTaskEstDur.value)) != 0) ? 60 * (inputTaskEstDur.value - parseInt(inputTaskEstDur.value)) + "min" : "");
+            // Add the user's estimate of the time taken. A little difficult to read, but I wanted to try out this combination
+            let taskDurationEstPretty = (taskEstDurCorr < 1) ? 60 * taskEstDurCorr + "min" :
+                parseInt(taskEstDurCorr) + "h " +
+                (((taskEstDurCorr - parseInt(taskEstDurCorr)) != 0) ? 60 * (taskEstDurCorr - parseInt(taskEstDurCorr)) + "min" : "");
+    
+            let taskDurationEstimate = document.createElement("time");
+            Object.assign(taskDurationEstimate, {
+                className: "taskDurEstimate",
+                textContent: taskDurationEstPretty,
+                title: "Estimated task duration"
+            });
 
-        let taskDurationEstimate = document.createElement("time");
-        Object.assign(taskDurationEstimate, {
-            className: "taskDurEstimate",
-            textContent: taskDurationEstPretty,
-            title: "Estimated task duration"
-        });
-        
-        taskDurationEstimate.setAttribute("duration", inputTaskEstDur.value * 3600); // Converted to seconds 
-        taskTimeDiv.append(taskDurationEstimate);
+            taskDurationEstimate.setAttribute("duration", taskEstDurCorr * 3600); // Converted to seconds 
+            
+            // Show the taskStatus panel since the user chose a time estimate
+            taskStatusPanel.classList.remove("hidden");
+            taskTimeDiv.append(taskDurationEstimate);
+        }
 
         newTaskElem.append(taskTimeDiv);
-
         
-        // Since task duration is an optional parameter, we'll hide the estimate if user chose to ignore it
-        if (inputTaskEstDur.value == 0) { taskDurationEstimate.classList.add("hidden"); }
-
         // Append the todo item to the pending tasks list
         lstPending.appendChild(newTaskElem);
 
-        // Clear textbox - inspired by in class discussion
+        // Clear textbox and number inputs - inspired by in class discussion
         inputTaskElem.value = "";
+        inputTaskEstDur.value = "";
         
+        // Unhide the pending tasks section
+        lstPending.parentElement.classList.remove("hidden");
+
         // Set focus back to inputTaskElem
         inputTaskElem.focus();
         
@@ -186,7 +198,7 @@ function createTask(event)
         displayError("Task description may not be blank.");
     }
     else if (arrTaskTexts.includes(newTaskText)) {
-        displayError("A task already exists with the same description, please try again.");
+        displayError("A pending task already exists with the same description, please try again.");
     }
     
 }
@@ -196,13 +208,15 @@ function relegateToCompleted(event)
 {
     // Parent element from event
     let completedTask = event.srcElement.parentElement;
+    // Parent container of the completed task
+    let parentContainer = completedTask.parentElement;
     // Replaced childNodes with querySelector
     let chkCompletedTask = completedTask.querySelector("[name='chkTaskComplete']");
     // Reference to taskStatus
     let taskStatusPanel = completedTask.querySelector(".taskStatus");
     // Reference to the timeContainer (div with all the <time> elements)
-    let taskTimeDiv = completedTask.querySelector("#timeContainer");
-
+    let taskTimeDiv = completedTask.querySelector(".timeContainer");
+    
     // https://www.w3schools.com/jsref/prop_checkbox_disabled.asp
     chkCompletedTask.disabled = true;
     
@@ -216,47 +230,64 @@ function relegateToCompleted(event)
         textContent: (new DateHandler()).prettyDate(),
         title: "Task completed"
     });
-
-    //taskEditTime.setAttribute("datetime", new DateHandler().dateTime); // Easier to manipulate later on. Ref https://stackoverflow.com/a/35494888/12802214
-
-
-    // Get the value for time the task was started
-    let taskStartTime = completedTask.querySelector("time.startTime").getAttribute("datetime");
-    // This will be the actual duration, in seconds
-    let taskDurActual = (new DateHandler(new Date(taskStartTime))).timeToPresent();
-
-    // Comparison between the estimate and the actual
-    let taskEstDur = completedTask.querySelector("time.taskDurEstimate").getAttribute("duration");
-    let durationDiff = taskDurActual - taskEstDur;
-
-    if (Math.abs(durationDiff) < 300)
-    { 
-        // Assume if the difference is under 300s (5 min), we're on time
-        taskStatusPanel.querySelector(".taskStatusLabel").textContent = "On time";
-        taskStatusPanel.querySelector(".taskStatusTime").textContent = durationDiff + "s"
-    } else if (durationDiff < 0)
-    {
-        // Early
-        taskStatusPanel.querySelector(".taskStatusLabel").textContent = "Early";
-        taskStatusPanel.querySelector(".taskStatusTime").textContent = Math.abs(Math.round(durationDiff / 60)) + "min";
-
-    } else 
-    {
-        // Late
-        taskStatusPanel.querySelector(".taskStatusLabel").textContent = "Late";
-        taskStatusPanel.querySelector(".taskStatusTime").textContent = Math.abs(Math.round(durationDiff / 60)) + "min";
-    }
+  
+    // Check if taskEstDur exists. If it exists, take the value, otherwise let it be null
+    let taskEstDur = (completedTask.querySelector("time.taskDurEstimate") === null) ?
+        null: completedTask.querySelector("time.taskDurEstimate").getAttribute("duration") ;
     
+    // Don't do anything if the estimate wasn't supplied
+    if (taskEstDur != null) {
+        // Get the value for time the task was started
+        let taskStartTime = completedTask.querySelector("time.startTime").getAttribute("datetime");
+        // This will be the actual duration, in seconds
+        let taskDurActual = (new DateHandler(new Date(taskStartTime))).timeToPresent();
+
+        // Comparison between the estimate and the actual
+        let durationDiff = taskDurActual - taskEstDur;
+
+        if (Math.abs(durationDiff) < 300) {
+            // Assume if the difference is under 300s (5 min), we're on time
+            taskStatusPanel.querySelector(".taskStatusLabel").textContent = "on time";
+            taskStatusPanel.querySelector(".taskStatusLabel").classList.add("ontime");
+            taskStatusPanel.querySelector(".taskStatusTime").textContent = durationDiff + "s"
+        } else if (durationDiff < 0) {
+            // Early
+            taskStatusPanel.querySelector(".taskStatusLabel").textContent = "early";
+            taskStatusPanel.querySelector(".taskStatusLabel").classList.add("early");
+            taskStatusPanel.querySelector(".taskStatusTime").textContent = Math.abs(Math.round(durationDiff / 60)) + "min";
+
+        } else {
+            // Late
+            taskStatusPanel.querySelector(".taskStatusLabel").textContent = "late";
+            taskStatusPanel.querySelector(".taskStatusLabel").classList.add("late");
+            taskStatusPanel.querySelector(".taskStatusTime").textContent = Math.abs(Math.round(durationDiff / 60)) + "min";
+        }
+    }
+
     taskTimeDiv.append(taskEndTime);
+
+    // Unhide the completed tasks section. Relevant only for first task being added to Completed tasks list.
+    lstCompleted.parentElement.classList.remove("hidden");
+
+    if (parentContainer.childNodes.length == 0) { parentContainer.parentElement.classList.add("hidden"); }
 }
 
 // Function that deletes the task
 function deleteTask(event)
 {
+    /* There are many options for this, but this one seemed most elegant
+    Find the parent element (task <li>) of the source element that raised the event (<button>) */
     let currentTask = event.srcElement.parentElement;
+    let parentContainer = currentTask.parentElement;
+    // ...and remove the element.
     currentTask.remove(currentTask);
-}
 
+    /* Looked for array of children, found https://stackoverflow.com/a/10474679/12802214 
+       Intent is to hide the parent container if it's empty. Purely for aesthetics. Note, this will be copied
+       without comment to other sections where relevant. */
+    if (parentContainer.childNodes.length == 0) { parentContainer.parentElement.classList.add("hidden"); }
+
+}
 
 // Function that creates the in-place editor for the current task
 function editTask(event)
@@ -268,68 +299,70 @@ function editTask(event)
     let currentTaskText = currentTaskTextElem.textContent;
 
     // Get a list of elements to be hidden when user clicks on Edit
-    // [name='chkTaskComplete']
-    // TODO hide times while editing
-
-    let taskControls = currentTask.querySelectorAll("#timeContainer, [name='btnStartTask'], [name='btnEditTask'], [name='btnDelTask']");
-
+    let taskControls = currentTask.querySelectorAll(".taskStatus, .timeContainer, [name='btnStartTask'], [name='btnEditTask'], [name='btnDelTask']");
+    // Changed from forEach to for..of. Used to have an arrow function though. Sad.
+    for (element of taskControls) { element.classList.add("hidden"); }
+    
     // Create a new textbox containing existing task description
     let newTaskEditor = document.createElement("input");
     Object.assign(newTaskEditor, {
         type: "text",
+        classList: "textEntry",
         name: "txtTaskInplaceEdit",
         value: currentTaskText,
         title: "Edit the current task description"
     });
 
-    // Create an event to handle user changing the block and pressing enter
-    // keydown event general https://www.w3schools.com/jsref/event_onkeydown.asp
-    // event.key: https://stackoverflow.com/a/46210516/12802214
-    newTaskEditor.addEventListener("keydown", (event) => { if (event.key == "enter") processTaskEdit(event); });
+    /* Create an event to handle user changing the block and pressing enter
+       keydown event general https://www.w3schools.com/jsref/event_onkeydown.asp
+       event.key: https://stackoverflow.com/a/46210516/12802214
+       dispatchEvent as from js-gallery demo (altx.dev/js-gallery) */
+    newTaskEditor.addEventListener("keydown", (event) => {
+        if (event.key == "Enter") {
+            processTaskEdit(event);
+        } else if (event.key == "Escape") {
+            currentTaskBtnEditCancel.dispatchEvent(new Event("click"));
+        }
+    });
 
-    // TODO add a button to confirm/save
-    let currentTaskBtnEditConfirm = document.createElement("input")
+    // Confirm/save changes button
+    let currentTaskBtnEditConfirm = document.createElement("button")
     Object.assign(currentTaskBtnEditConfirm, {
-        type: "button",
         name: "btnTaskInplaceEditConfirm",
-        value: "Confirm",
+        classList: "fas fa-check",
         title: "Confirm changes"
     });
 
     currentTaskBtnEditConfirm.addEventListener("click", (event) => { processTaskEdit(event); });
 
     // Cancel button, returns changes back to normal
-    let currentTaskBtnEditCancel = document.createElement("input")
+    let currentTaskBtnEditCancel = document.createElement("button")
     Object.assign(currentTaskBtnEditCancel, {
-        type: "button",
         name: "btnTaskInplaceEditCancel",
-        value: "Cancel",
-        title: "Discard changes to current task"
+        classList: "fas fa-times",
+        title: "Discard changes"
     });
 
-    // Event handler for user cancellation - there is no need for a separate function definition for convenience
-    // i.e. not having to redeclare variables 
+    /* Event handler for user cancellation - there is no need for a separate function definition for convenience
+       i.e. not having to redeclare variables */
     currentTaskBtnEditCancel.addEventListener("click", (event) => {
         // Get all the editor components requiring removal
         let taskEditorCtls = currentTask.querySelectorAll("[name='btnTaskInplaceEditCancel'], [name='btnTaskInplaceEditConfirm']");
-        taskEditorCtls.forEach(element => { element.remove(element); });
+        for (element of taskEditorCtls) { element.remove(element); }
 
         // Unhide the control elements that were previously hidden
-        taskControls.forEach((element) => { element.classList.remove("hidden"); });        
+        for (element of taskControls) { element.classList.remove("hidden"); }        
         
         newTaskEditor.replaceWith(currentTaskTextElem);
     });
 
-    // Hide task controls not used during editing
-    taskControls.forEach((element) => { element.classList.add("hidden"); });
-    
     // Add the button for confirmation of change and cancellation of task editing
     currentTask.append(currentTaskBtnEditConfirm);
     currentTask.append(currentTaskBtnEditCancel);
 
-    // TODO set focus onto the newTaskEditor
-
     currentTaskTextElem.replaceWith(newTaskEditor);
+
+    // Set focus on new task editor
     newTaskEditor.focus;
 }
 
@@ -338,42 +371,58 @@ function processTaskEdit(event)
     let currentTask = event.srcElement.parentElement;
     let taskEditorElement = currentTask.querySelector("[name='txtTaskInplaceEdit']");
     let newTaskText = taskEditorElement.value; 
-    let taskTimeDiv = currentTask.querySelector("#timeContainer");
+    let taskTimeDiv = currentTask.querySelector(".timeContainer");
 
-    // Find the redundant buttons specific to the edit action (needed for removal later)
-    let taskEditorBtns = currentTask.querySelectorAll("[name='btnTaskInplaceEditCancel'], [name='btnTaskInplaceEditConfirm']");
-
-    // Create a substitute h2 element containing newly entered text
-    let newTask = document.createElement("h2");
-    newTask.textContent = newTaskText;
-
-    // Replace the textbox with the new h2 element containing the task description
-    taskEditorElement.replaceWith(newTask);
-    taskEditorBtns.forEach(element => { element.remove(element); });
+    // Like in add task, it's necessary to check if the item already exists in the pending items list
+    let arrTaskTexts = Array.from(lstPending.querySelectorAll("li h2")).map((element) => element.textContent);
     
-    // Restore task controls on completion of editing
-    let taskControls = currentTask.querySelectorAll("#timeContainer, [name='btnStartTask'], [name='btnEditTask'], [name='btnDelTask']");
-    taskControls.forEach((element) => { element.classList.remove("hidden"); }); 
-    
-    // Use time tag to contextualize the data - ref https://www.w3schools.com/tags/tag_time.asp
-    // A bit of a different approach. If the <time> block with .editTime class does not exist, create it, otherwise assign reference to taskEditTime.
-    let taskEditTime = (currentTask.querySelector("time.editTime") == null) ? document.createElement("time") : currentTask.querySelector(".editTime");
-    Object.assign(taskEditTime, {
-        className: "editTime",
-        textContent: (new DateHandler()).prettyDate(),
-        title: "Last edited"
-    });
-    taskEditTime.setAttribute("datetime", new DateHandler().dateTime); // Easier to manipulate later on. Ref https://stackoverflow.com/a/35494888/12802214
+    if (newTaskText != "" && !arrTaskTexts.includes(newTaskText))
+    {
+        // Find the redundant buttons specific to the edit action (needed for removal later)
+        let taskEditorBtns = currentTask.querySelectorAll("[name='btnTaskInplaceEditCancel'], [name='btnTaskInplaceEditConfirm']");
 
-    taskTimeDiv.append(taskEditTime);
+        // Create a substitute h2 element containing newly entered text
+        let newTask = document.createElement("h2");
+        newTask.textContent = newTaskText;
+
+        // Replace the textbox with the new h2 element containing the task description
+        taskEditorElement.replaceWith(newTask);
+        for (element of taskEditorBtns) { element.remove(element); }
+
+        // Restore task controls on completion of editing
+        let taskControls = currentTask.querySelectorAll(".taskStatus, .timeContainer, [name='btnStartTask'], [name='btnEditTask'], [name='btnDelTask']");
+        for (element of taskControls) { element.classList.remove("hidden"); }
+    
+        /* Use time tag to contextualize the data - ref https://www.w3schools.com/tags/tag_time.asp
+           A bit of a different approach. If the <time> block with .editTime class does not exist, create it, 
+           otherwise assign reference to taskEditTime. */
+        let taskEditTime = (currentTask.querySelector("time.editTime") == null) ? document.createElement("time") : currentTask.querySelector(".editTime");
+        Object.assign(taskEditTime, {
+            className: "editTime",
+            textContent: (new DateHandler()).prettyDate(),
+            title: "Last edited"
+        });
+
+        // Easier to manipulate later on. Ref https://stackoverflow.com/a/35494888/12802214
+        taskEditTime.setAttribute("datetime", new DateHandler().dateTime);
+
+        taskTimeDiv.append(taskEditTime);
+    } 
+    else if (newTaskText == "") {
+        displayError("Task description may not be blank.", createWarnElement = true, parentContainer = currentTask);
+    }
+    else if (arrTaskTexts.includes(newTaskText)) {
+        displayError("A pending task already exists with the same description, please try again.", createWarnElement = true, parentContainer = currentTask);
+    }
 
 }
 
 function startTask(event)
 {
-    let currentTask = event.srcElement.parentElement.parentElement;
-    let taskTimeDiv = currentTask.querySelector("#timeContainer");
-    console.log(event);
+    let currentTask = event.srcElement.parentElement;
+    let parentContainer = currentTask.parentElement;
+    let taskTimeDiv = currentTask.querySelector(".timeContainer");
+
     // Show the checkbox, allowing the user to complete the task
     currentTask.querySelector("[name='chkTaskComplete']").classList.remove("hidden");
 
@@ -384,23 +433,30 @@ function startTask(event)
         textContent: (new DateHandler()).prettyDate(),
         title: "Start time"
     });
-
+    // Store the timestamp into the datetime attribute of the <time> element. This allows 
     taskStartTime.setAttribute("datetime", new DateHandler().dateTime);
 
     taskTimeDiv.append(taskStartTime);
      
-    // Remove task controls on completion of editing
+    // Remove task controls after starting the task
     let taskControls = currentTask.querySelectorAll("[name='btnStartTask'], [name='btnEditTask']");
-    taskControls.forEach(element => { element.remove(element); });
+    // Replaced forEach with for..of
+    for (element of taskControls) { element.remove(element); }
 
     lstActive.append(currentTask);
+
+    // Remove hidden attribute from the lstActive parent
+    lstActive.parentElement.classList.remove("hidden");
+    
+    // Hide the Pending task container if empty
+    if (parentContainer.childNodes.length == 0) { parentContainer.parentElement.classList.add("hidden"); }
 
 }
 
 
 /* DateHandler object. Used to process dates and times. Not exactly necessary, but I learned a lot from it
-Inspired by an example on https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions
-section "Invoked through call or apply"  even though no arrow functions were used */
+   Inspired by a generic example on https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions
+   section "Invoked through call or apply"  even though no arrow functions were used */
 
 function DateHandler(selDate = new Date()) {
     // Formatting function for single digit date figures
@@ -458,10 +514,30 @@ function DateHandler(selDate = new Date()) {
 
 
 // Error display
-function displayError(errorDesc)
+function displayError(errorDesc, createWarnElement = false, parentContainer = null)
 {
+    // Reference to the warning element
+    let warningElement;
+    
+    // Check if parentContainer is specified and createWarnElement is true - if so, create the warning element
+    if ((parentContainer != null) && createWarnElement)
+    {
+        warningElement = document.createElement("label");
+        Object.assign(warningElement, {
+            classList: "warningElement"
+        });
+
+        parentContainer.append(warningElement);
+    }
+    else
+    {
+        /* If both createWarnElement is false and parentContainer is null, select the warning text element in the 
+           the task description input form container */
+        warningElement = document.querySelector("form label.warningElement");
+    }
+
     // Displays an error message errorDesc for 3 seconds in the #warningText element
      clearTimeout(timeout);
-     document.querySelector("#warningText").textContent = errorDesc;
-     timeout = setTimeout( () => { document.querySelector("#warningText").textContent = ""; }, 3000);
+     warningElement.textContent = errorDesc;
+     timeout = setTimeout( () => { warningElement.textContent = ""; }, 3000);
 }

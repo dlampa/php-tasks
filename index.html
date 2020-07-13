@@ -1,15 +1,22 @@
 <!DOCTYPE html>
 
+<!--
+Welcome to jsTask, a simple task app created as part of the TECHCareers program.
+
+Layout and design has been inspired by services such as Trello, GMail, Microsoft To Do (Wunderlist), etc.
+-->
+
 <html lang="en-CA">
+    <!-- Use of different elements based on understanding gained from https://www.w3schools.com/html/html_form_elements.asp -->
     <head>
         <meta charset="utf-8" />
         <meta description="A basic to-do web app written entirely in JS" />
         <meta author="Damir Lampa" />
+        <!-- https://developer.mozilla.org/en-US/docs/Mozilla/Mobile/Viewport_meta_tag -->
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-        <link rel="stylesheet" href="css/reset.css" />
-        <link rel="stylesheet" href="css/styles.css" /> <!-- will be renamed to layout.css -->
-       <!-- <link
-            <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Dancing+Script:wght@700&family=Roboto:wght@100;300;400;700;900&display=swap" rel="stylesheet"> <!-- Google fonts -->
+        <link rel="stylesheet" href="css/reset.css" /> <!-- Credits in file -->
+        <link rel="stylesheet" href="css/styles.css" /> <!-- TODO rename to layout.css -->
         <link rel="stylesheet" href="css/fonts.css" />
         <link rel="stylesheet" href="css/colours.css" />
         <script src="https://kit.fontawesome.com/308aa213dc.js" crossorigin="anonymous"></script> <!-- Font Awesome Icons -->
@@ -19,54 +26,34 @@
     </head>
     <body>
         <header>
-            <!-- Let the user know they made it to the world's least useful todo app-->
-            <a href="#" id="appMenu" class="hidden"><i class="fas fa-tasks"></i></a>
             <p>jsTask</p>
         </header>
         <main>
-            <!-- Split into three sections
-            1. Data entry
-            2. Pending items (will treat this section as )
-            3. Active items
-            4. Completed items
-            -->
+            <!-- Data entry/task creation -->
             <section id="dataEntry">
-                <!-- Data entry/task creation -->
                 <form post="method">
-                    <!-- Use of different elements based on understanding gained from https://www.w3schools.com/html/html_form_elements.asp -->
-                        <!-- <label for="taskText">Todo:</label>  remove -->
-                        <input type="text" id="taskText" class="textEntry" name="taskText" title="Enter the task description here" placeholder="Add a task" />
-                        <div>
-                        <label for ="taskEstDur"><i class="far fa-clock"></i></label>
-                        <input type="number" id="taskEstDur" class="textEntry" name="taskEstDur" min="0" max="10" step="0.25" placeholder="hrs (opt)" title="Estimated task duration (in hours, optional)"/>
-                        </div>
-                        <button id="btnAddTask" name="btnAddTask" title="Add the task to the Pending Tasks list."><i class="fas fa-plus"></i></button>
-                        <label id="warningText"></label>
+                        <input type="text" id="taskText" class="textEntry" name="taskText" title="Task description" placeholder="Add a task" />
+                        <input type="number" id="taskEstDur" class="textEntry" name="taskEstDur" min="0" max="10" step="0.25" placeholder="&#xf017;" title="Estimated task duration (in hours, optional)" />
+                        <button id="btnAddTask" name="btnAddTask" title="Add the task to the Pending Tasks list." class="fas fa-plus"></button>
+                        <label id="warningText" class="warningElement"></label>
                 </form>
             </section>
-            <section id="secPending">
-                <!-- Pending tasks - will use as active task list until later commit -->
+            <!-- Pending tasks -->
+            <section id="secPending" class="hidden">
                 <h1>Pending tasks</h1>
                 <ul></ul>
             </section>
-            <section id="secActive">
-                <!-- Active tasks -->
+            <!-- Active tasks -->
+            <section id="secActive" class="hidden">
                 <h1>Active tasks</h1>
                 <ul></ul>
             </section>
-            <section id="secCompleted">
-                <!-- Completed tasks -->
+            <!-- Completed tasks -->
+            <section id="secCompleted" class="hidden">
                 <h1>Completed tasks</h1>
                 <ul></ul>
             </section>
         </main>
-        <footer>
-            <!-- Some features to be added here in the future
-            Ideas: item counters for pending, active and complete items
-            Extra Extra: average time over/under for pending items
-            -->
-        </footer>
-    
     </body>
 
 </html>
