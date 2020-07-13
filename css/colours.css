@@ -22,7 +22,7 @@
 body {
     background-color: rgba(0,0,0,0.25);
     /* Taken from unsplash.com:  */
-    background-image: url("/img/andy-holmes-unsplash2400.jpg");  
+    background-image: url("../img/andy-holmes-unsplash2400.jpg");  
     background-size: cover;
     background-position-x: center;
     background-position-y: top;
