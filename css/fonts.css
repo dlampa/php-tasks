@@ -2,7 +2,9 @@
    with the exception of the app title, which I wanted to make somewhat fancier.
    All fonts sourced from Google.
 
-   All font sizes have been specified using keywords. This is better from 
+   All font sizes have been specified using keywords. This is better from accessibility perspective 
+   as it allows the user to have more control over font sizing (sufficient for user to set the size for
+   medium font size in browser, the rest are determined by the browser automatically)
 */
 
 @import url("https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Dancing+Script:wght@700&family=Roboto:wght@100;300;400;700;900&display=swap");

@@ -1,4 +1,4 @@
-# jsTODO web app
+# jsTasks web app
 TECHCareers Assignment 3 - Simple JavaScript TODO app (with a twist)
 
 This is my first JavaScript app - a simple take on the classic to-do concept. As it is based on pure JS, data is not persistent.
@@ -15,11 +15,7 @@ This is my first JavaScript app - a simple take on the classic to-do concept. As
 
 ## Live website
 
-You can see the live version of this project at the following [link](https://altx.dev/js-todo)
-
-## Screenshots
-
-TODO - after project completion
+You can see the live version of this project at the following [link](https://altx.dev/jstasks)
 
 ## Trello project board
 

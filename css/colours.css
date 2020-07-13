@@ -23,7 +23,7 @@ body {
     background-color: rgba(0,0,0,0.25);
     /* Taken from unsplash.com:  */
     background-image: url("/img/andy-holmes-unsplash2400.jpg");  
-    background-repeat: no-repeat;
+    background-size: cover;
     background-position-x: center;
     background-position-y: top;
     background-blend-mode: darken; /* Blends the background color with background-image */

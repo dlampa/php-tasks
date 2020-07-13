@@ -1,4 +1,4 @@
-/* Welcome to jsTask!
+/* Welcome to jsTasks!
    A non-persistent task manager written in JS!
 */
 
