@@ -1,29 +1,19 @@
 <!DOCTYPE html>
 
 <!--
-Welcome to jsTasks, a simple task app created as part of the TECHCareers program.
+Welcome to phpTasks, a rework of jsTasks with PHP as a backend in place of pure JS DOM manipulation.
 
 Layout and design has been inspired by services such as Trello, GMail, Microsoft To Do (Wunderlist), etc.
 -->
 
-<html lang="en-CA">
-    <!-- Use of different elements based on understanding gained from https://www.w3schools.com/html/html_form_elements.asp -->
-    <head>
-        <meta charset="utf-8" />
-        <meta description="A basic to-do web app written entirely in JS" />
-        <meta author="Damir Lampa" />
-        <!-- https://developer.mozilla.org/en-US/docs/Mozilla/Mobile/Viewport_meta_tag -->
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+<?php
+include 'includes/session.php';
+include 'includes/head.php';
 
-        <link rel="stylesheet" href="css/reset.css" /> <!-- Credits in file -->
-        <link rel="stylesheet" href="css/layout.css" />
-        <link rel="stylesheet" href="css/fonts.css" />
-        <link rel="stylesheet" href="css/colours.css" />
-        <script src="https://kit.fontawesome.com/308aa213dc.js" crossorigin="anonymous"></script> <!-- Font Awesome Icons -->
-        <script src="js/todo.js" defer></script>
 
-        <title>jsTasks</title>
-    </head>
+?>
+
+
     <body>
         <header>
             <p>jsTasks</p>
@@ -31,7 +21,8 @@ Layout and design has been inspired by services such as Trello, GMail, Microsoft
         <main>
             <!-- Data entry/task creation -->
             <section id="dataEntry">
-                <form post="method">
+                <form action="index.php" method="post">
+                        <input type="hidden" name="method" value="add" />
                         <input type="text" id="taskText" class="textEntry" name="taskText" title="Task description" placeholder="Add a task" />
                         <input type="number" id="taskEstDur" class="textEntry" name="taskEstDur" min="0" max="10" step="0.25" placeholder="&#xf017;" title="Estimated task duration (in hours, optional)" />
                         <button id="btnAddTask" name="btnAddTask" title="Add the task to the Pending Tasks list." class="fas fa-plus"></button>

@@ -1,22 +1,17 @@
-# jsTasks web app
-TECHCareers Assignment 3 - Simple JavaScript TODO app (with a twist)
+# phpTasks web app
+TECHCareers Assignment x - jsTasks + PHP = phpTasks
 
-This is my first JavaScript app - a simple take on the classic to-do concept. As it is based on pure JS, data is not persistent.
+This is my first PHP app and is essentially a rework of the previous work, jsTasks, with the PHP used as a backend. 
 
 ## Assignment
-* Create a simple to-do app that can handle adding, editing and deleting tasks through a simple, intuitive interface.
 
-* The app should be able to visually sort items based on their completion status (i.e. in pending, active, completed columns)
+* Use PHP variables, arrays, includes.
 
-* Creation, completion, editing, etc. times should be shown together with the tasks.
+* Handle `<form>` submission using PHP, with appropriate `method` and `action` attributes.
 
-* Allow the user to estimate completion time for each task, then compare and report status of the task back to the user (late, early, etc.)
-
+* Storing, manipulating and retrieving data from the $_SESSION global variable.
 
 ## Live website
 
-You can see the live version of this project at the following [link](https://altx.dev/jstasks)
+You can see the live version of this project at the following [link](https://altx.dev/phptasks)
 
-## Trello project board
-
-Access the Trello board for the project [here](https://trello.com/b/ijRcoZGY/js-todo)
