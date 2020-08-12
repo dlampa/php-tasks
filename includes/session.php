@@ -12,7 +12,7 @@
  *    - Each todo item will be an object instantiated from a class TodoItem. 
  * 4. TodoItem will have the following properties:
  *    - uuid 
- *    - item description
+ *    - item task (description)
  *    - start time
  *    - edit time (optional)
  *    - estimated completion time (optional)
@@ -29,5 +29,32 @@
  $_SESSION['active-todo-list'] ?? [];
  $_SESSION['completed-todo-list'] ?? [];
  
+/*  Declare a new class Todo
+    Ref: https://www.php.net/manual/en/language.oop5.basic.php */
+
+class Todo {
+
+    public $uuid = "";
+    public $itemTask = "";
+
+    public $itemTimeStarted;
+    public $itemTimeCompleted;
+    public $itemTimeComplEstimate;
+    public $itemTimeEdited;
+
+}
+
+/* Actions on form submission - a kind of a 'reducer' */
+
+switch($_POST['action']) {
+    case 'add':
+        break;
+    case 'delete':
+        break;
+    case 'completeItem':
+        break;
+}
+
+
+
  ?>
- 

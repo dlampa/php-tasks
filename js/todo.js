@@ -22,6 +22,11 @@ function createTask(event)
     // Important for preventing the normal form submit behavior since the same function is used for both event handlers (see Event handlers above)
     event.preventDefault();
 
+    let parentForm = event.target.parentElement;
+    parentForm.submit();
+    
+    break;
+
     let inputTaskElem = document.querySelector("#taskText");
     let inputTaskEstDur = document.querySelector("[name='taskEstDur']");
     let newTaskText = inputTaskElem.value.trim();
