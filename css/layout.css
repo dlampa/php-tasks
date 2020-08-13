@@ -44,7 +44,7 @@ section:first-of-type {
 }
 
 /* Task entry form container */
-form {
+#dataEntry form {
     padding: 10px;
     display: flex;
     flex-flow: row wrap;

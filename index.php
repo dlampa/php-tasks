@@ -47,60 +47,113 @@ $_SESSION['last-requestId'] = uniqid();
         </section>
         <!-- Pending tasks -->
         <!-- <section id="secPending" class="hidden"> -->
-        <section id="secPending" class="<?php count($_SESSION['pendingTaskList']) > 0 ? 'hidden' : null ?>">
+        <section id="secPending" class="<?php echo empty($_SESSION['pendingTaskList']) ? 'hidden' : null ?>">
             <h1>Pending tasks</h1>
             <ul>
                 <?php
-                foreach ($_SESSION['pendingTaskList'] as $task) {
-                    // Create the task element with all the basic buttons/etc. for interaction. JS will take care of the rest.
-                    echo '<li uuid="' . $task->uuid . '"> <h2>' . $task->itemTask . '</h2>' .
-                        '<form method="post" action="index.php" requestId="' . $_SESSION['last-requestId'] . '">
+                // Create the task element with all the basic buttons/etc. for interaction. JS will take care of the rest.
+                // This should have been a function
+                foreach ($_SESSION['pendingTaskList'] as $task) : ?>
+                    <li uuid="<?php echo $task->uuid ?>">
+                        <h2><?php echo $task->itemTask ?> </h2>
+                        <form method="post" action="index.php" requestId="<?php echo $_SESSION['last-requestId'] ?>">
+                            <button action="editTask" class="far fa-edit" title="Edit task details"></button>
                             <button action="startTask" class="fas fa-running" title="Start the task"></button>
                             <button action="deleteTask" class="far fa-trash-alt" title="Delete the task"></button>
-                            </form>
+                        </form>
                         <div class="timeContainer">
-                            <aside class="taskStatus ' . $task->itemTimeComplEstimate == null ? 'hidden' : null . '">
-                                <p class="taskStatusLabel"></p>
-                                <p class="taskStatusTime"></p>
-                            </aside>
-                            <time class="creationTime" datetime="' . $task->itemTimeStarted .  '" title="Time created">' .
-                            Date('Y-M-d H:i', $task->itemTimeStarted) .  '</time>' .
-                            ($task->itemTimeComplEstimate ? '<time class="classDurEstimate" duration="' . $task->itemTimeComplEstimate * 3600 . '"> $task->itemTimeComplEstimate</time>' : null) .
-                        '</div>
-                        </li>';
-                }
-                ?>
+                            <time class="creationTime" datetime="<?php echo $task->itemTimeCreated ?>" title="Time created">
+                                <?php echo Date('Y-M-d H:i', $task->itemTimeCreated) ?>
+                            </time>
+                            <?php if ($task->itemTimeComplEstimate != null) : ?>
+                                <time class="taskDurEstimate" title="Estimated task duration">
+                                    <?php echo $task->itemTimeComplEstimate ?>
+                                </time>
+                            <?php endif; ?>
+                        </div>
+                    </li>
+                <?php endforeach; ?>
             </ul>
         </section>
         <!-- Active tasks -->
-        <section id="secActive" class="<?php count($_SESSION['pendingTaskList']) > 0 ? 'hidden' : null ?>">
+        <section id="secActive" class="<?php echo empty($_SESSION['activeTaskList']) ? 'hidden' : null ?>">
             <h1>Active tasks</h1>
             <ul>
                 <?php
-                foreach ($_SESSION['activeTaskList'] as $task) {
-                    // Create the task element with all the basic buttons/etc. for interaction. JS will take care of the rest.
-                    echo '<li uuid="' . $task->uuid . '">' . $task->itemTask .
-                        '<form method="post" action="index.php" requestId="' . $_SESSION['last-requestId'] . '">
-                            <button action="startTask" class="fas fa-running" title="Start the task"></button>
-                            <button action="delete" class="far fa-trash-alt" title="Delete the task"></button>
-                            </form>
-                        </li>';
-                }
-                ?>
+                // Create the task element with all the basic buttons/etc. for interaction. JS will take care of the rest.
+                // This should have been a function
+                foreach ($_SESSION['activeTaskList'] as $task) : ?>
+                    <li uuid="<?php echo $task->uuid ?>">
+                        <input type="checkbox" name="completeTask" title="Mark task as completed" requestId="<?php echo $_SESSION['last-requestId'] ?>" />
+                        <h2><?php echo $task->itemTask ?></h2>
+                        <form method="post" action="index.php" requestId="<?php echo $_SESSION['last-requestId'] ?>">
+                            <button action="deleteTask" class="far fa-trash-alt" title="Delete the task"></button>
+                        </form>
+                        <div class="timeContainer">
+                            <time class="creationTime" datetime="<?php echo $task->itemTimeCreated ?>" title="Time created">
+                                <?php echo Date('Y-M-d H:i', $task->itemTimeCreated) ?>
+                            </time>
+                            <time class="startTime" datetime="<?php echo $task->itemTimeStarted ?>" title="Start time">
+                                <?php echo Date('Y-M-d H:i', $task->itemTimeStarted) ?>
+                            </time>
+                            <?php if ($task->itemTimeComplEstimate != null) : ?>
+                                <time class="taskDurEstimate" title="Estimated task duration">
+                                    <?php echo $task->itemTimeComplEstimate ?>
+                                </time>
+                            <?php endif; ?>
+                        </div>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+            </ul>
+        </section>
+        <!-- Completed tasks -->
+        <section id="secCompleted" class="<?php echo empty($_SESSION['completedTaskList']) ? 'hidden' : null ?>">
+            <h1>Completed tasks</h1>
+            <ul>
+                <?php
+                // Create the task element with all the basic buttons/etc. for interaction. JS will take care of the rest.
+                // This should have been a function
+                foreach ($_SESSION['completedTaskList'] as $task) : ?>
+                    <li uuid="<?php echo $task->uuid ?>">
+                        <input type="checkbox" name="completeTask" title="Mark task as completed" checked disabled />
+                        <h2><?php echo $task->itemTask ?></h2>
+                        <?php if ($task->itemTimeComplEstimate != null) : ?>
+                            <aside class="taskStatus">
+                                <p class="taskStatusLabel <?php echo $task->taskStatus(TRUE) ?>">
+                                    <?php echo $task->taskStatus() ?>
+                                </p>
+                                <p class="taskStatusTime">
+                                    <?php echo $task->itemTimeDiff ?>
+                                </p>
+                            </aside>
+                        <?php endif; ?>
+                        <form method="post" action="index.php" requestId="<?php echo $_SESSION['last-requestId'] ?>">
+                            <button action="deleteTask" class="far fa-trash-alt" title="Delete the task"></button>
+                        </form>
+                        <div class="timeContainer">
+                            <time class="creationTime" datetime="<?php echo $task->itemTimeCreated ?>" title="Time created">
+                                <?php echo Date('Y-M-d H:i', $task->itemTimeCreated) ?>
+                            </time>
+                            <time class="startTime" datetime="<?php echo $task->itemTimeStarted ?>" title="Start time">
+                                <?php echo Date('Y-M-d H:i', $task->itemTimeStarted) ?>
+                            </time>
+                            <?php if ($task->itemTimeComplEstimate != null) : ?>
+                                <time class="taskDurEstimate" title="Estimated task duration">
+                                    <?php echo $task->itemTimeComplEstimate ?>
+                                </time>
+                            <?php endif; ?>
+                            <time class="complTime" datetime="<?php echo $task->itemTimeCompleted ?>" title="Task completed">
+                                <?php echo Date("Y-M-d H:i", $task->itemTimeCompleted) ?>
+                            </time>
+                        </div>
+                    </li>
+                <?php endforeach; ?>
 
 
             </ul>
         </section>
-        <!-- Completed tasks -->
-        <section id="secCompleted" class="hidden">
-            <h1>Completed tasks</h1>
-            <ul></ul>
-        </section>
     </main>
-    <article id="debug">
-        <?php var_dump($_POST);
-        var_dump($_SESSION); ?>
-    </article>
 </body>
 
 </html>

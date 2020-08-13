@@ -44,6 +44,7 @@ if ($_SESSION['last-requestId'] == $_POST['requestId']) {
             $newTask = new Todo($_POST['taskText'], $_POST['taskEstDur']);
             array_push($_SESSION['pendingTaskList'], $newTask);
             break;
+
         case 'deleteTask':
             // Go through all three arrays and delete the task if the uuid matches
             $_SESSION['pendingTaskList'] = array_values(array_filter(
@@ -65,8 +66,8 @@ if ($_SESSION['last-requestId'] == $_POST['requestId']) {
                     return (!($item->uuid == $_POST['uuid']));
                 }
             ));
-
             break;
+
         case 'startTask':
             /*  Similar approach to JS - isolate the Task based on uuid from the pendingTaskList array
                 Then, take the task and push to the array activeTaskList. Finally remove from pendingTaskList array.
@@ -79,6 +80,9 @@ if ($_SESSION['last-requestId'] == $_POST['requestId']) {
                 function($item) {
                     return ($item->uuid == $_POST['uuid']);
             } ));
+            
+            // Set current time as task start time
+            $taskToStart->itemTimeStarted = time();
 
             // Add to the activeTaskList array
             array_push($_SESSION['activeTaskList'], $taskToStart);
@@ -90,9 +94,42 @@ if ($_SESSION['last-requestId'] == $_POST['requestId']) {
                     return (!($item->uuid == $_POST['uuid']));
                 }
             ));
-
             break;
+
+        case 'editTask':
+            $_SESSION['pendingTaskList'] = array_values(array_map(function($taskItem) {
+                if ($taskItem->uuid == $_POST['uuid']) {
+                    $taskItem->itemTask = $_POST['newTaskText'];
+                    $taskItem->itemTimeEdited = time();
+                    return $taskItem;
+                } else return $taskItem;
+
+            }, $_SESSION['pendingTaskList']));
+        
+            break;
+
         case 'completeTask':
+            [$taskToComplete] = array_values(array_filter(
+                $_SESSION['activeTaskList'],
+                function ($item) {
+                    return ($item->uuid == $_POST['uuid']);
+                }
+            ));
+
+            // Set current time as task completion time
+            $taskToComplete->itemTimeCompleted = time();
+
+            // Add to the completedTaskList array
+            array_push($_SESSION['completedTaskList'], $taskToComplete);
+
+            // Remove from the activeTaskList array
+            $_SESSION['activeTaskList'] = array_values(array_filter(
+                $_SESSION['activeTaskList'],
+                function ($item) {
+                    return (!($item->uuid == $_POST['uuid']));
+                }
+            ));
+
             break;
     }
 }

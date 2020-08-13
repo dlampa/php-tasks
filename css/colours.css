@@ -30,11 +30,6 @@ body {
     background-attachment: fixed;
 }
 
-/* TODO REMOVE */
-article {
-    background-color: white;
-}
-
 
 /* Header with app logo */
 header {
