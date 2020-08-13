@@ -19,12 +19,13 @@ inputForm.addEventListener("submit", (event) => { createTask(event); }); // Cate
 // Function for creating a new task list item
 function createTask(event)
 {
-    // Important for preventing the normal form submit behavior since the same function is used for both event handlers (see Event handlers above)
+    // Not strictly necessary (yet) - want to retain a bit of flexibility, so going to submit the form 'manually'
     event.preventDefault();
 
     let parentForm = event.target.parentElement;
-    parentForm.submit();
-    
+
+    //parentForm.submit();
+
     break;
 
     let inputTaskElem = document.querySelector("#taskText");

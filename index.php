@@ -1,5 +1,3 @@
-<!DOCTYPE html>
-
 <!--
 Welcome to phpTasks, a rework of jsTasks with PHP as a backend in place of pure JS DOM manipulation.
 
@@ -7,8 +5,22 @@ Layout and design has been inspired by services such as Trello, GMail, Microsoft
 -->
 
 <?php
-include 'includes/session.php';
+
+// Load the Todo class before loading session so that it's recognized 
+include 'includes/Todo.php';
+
+if (!isset($_SESSION)) {
+   
+    session_start();
+}
+
+require 'includes/session.php';
 include 'includes/head.php';
+
+// Store a request ID (any random value) and process request only if the requestID is consistent with the one passed down in $_POST.
+// This is to ensure that last POST is not reprocessed on refresh.
+// Ref: https://stackoverflow.com/a/38768140/12802214 (based on the concept in the link)
+$_SESSION['last-requestId'] = uniqid();
 
 
 ?>
@@ -30,12 +42,22 @@ include 'includes/head.php';
                 <!-- Using a hidden input to specify the action for the 'reducer'. 
                 https://www.w3schools.com/tags/att_input_type_hidden.asp  -->
                 <input type="hidden" name="action" value="add" />
+                <input type="hidden" name="requestId" value="<?php echo $_SESSION['last-requestId'] ?>" />
             </form>
         </section>
         <!-- Pending tasks -->
-        <section id="secPending" class="hidden">
+        <!-- <section id="secPending" class="hidden"> -->
+        <section id="secPending">
             <h1>Pending tasks</h1>
-            <ul></ul>
+            <ul>
+                <?php 
+                    foreach($_SESSION['pendingTaskList'] as $task) {
+                        //echo '<li>' . var_dump($task) . '</li>';
+                        echo '<li uuid="'. $task->uuid . '">' . $task->itemTask . '</li>';
+                        // echo '<li uuid="' . $taskProperty . '">' . $taskProperty . '</li>';
+                    }
+                ?>
+            </ul>
         </section>
         <!-- Active tasks -->
         <section id="secActive" class="hidden">
@@ -48,6 +70,9 @@ include 'includes/head.php';
             <ul></ul>
         </section>
     </main>
+            <article id="debug">
+                <?php var_dump($_POST); var_dump($_SESSION); ?>
+            </article>
 </body>
 
 </html>

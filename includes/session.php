@@ -1,7 +1,7 @@
-<? php 
+<?php
 # Session management - functions, initialisation of the stored state and data manipulation
 
-/**
+/*
  * Plan of action:
  * 1. Use functions to manage individual operations on the $_SESSION var
  * 2. Use a kind of a 'reducer' function which determines what to do when form data is submitted and calls 
@@ -20,41 +20,42 @@
  *    - completion time
  */
 
- session_start();
 
 
- // Use null coalescing operator. Wasn't happy with all the ifs and issets. This is neater.
- // Ref: https://stitcher.io/blog/shorthand-comparisons-in-php
- $_SESSION['pending-todo-list'] ?? [];
- $_SESSION['active-todo-list'] ?? [];
- $_SESSION['completed-todo-list'] ?? [];
+// Use null coalescing operator. Wasn't happy with all the ifs and issets. This is neater.
+// Ref: https://stitcher.io/blog/shorthand-comparisons-in-php
+$_SESSION['pendingTaskList'] = $_SESSION['pendingTaskList'] ?? [];
+$_SESSION['activeTaskList'] = $_SESSION['activeTaskList'] ?? [];
+$_SESSION['completedTaskList'] = $_SESSION['completedTaskList'] ?? [];
  
+//if ( !isset($_SESSION['pending-todo-list']) || empty($_SESSION['pending-todo-list']) ) { $_SESSION['pending-todo-list'] = array(); }
+
+
 /*  Declare a new class Todo
     Ref: https://www.php.net/manual/en/language.oop5.basic.php */
 
-class Todo {
 
-    public $uuid = "";
-    public $itemTask = "";
 
-    public $itemTimeStarted;
-    public $itemTimeCompleted;
-    public $itemTimeComplEstimate;
-    public $itemTimeEdited;
-
-}
-
+if ($_SESSION['last-requestId'] == $_POST['requestId']) {
 /* Actions on form submission - a kind of a 'reducer' */
-
-switch($_POST['action']) {
-    case 'add':
-        break;
-    case 'delete':
-        break;
-    case 'completeItem':
-        break;
+    switch ($_POST['action']) {
+        case 'add':
+            $newTask = new Todo($_POST['taskText'], $_POST['taskEstDur']);
+            array_push($_SESSION['pendingTaskList'], $newTask);
+        
+            unset($_POST);
+            break;
+        case 'delete':
+            break;
+        case 'startTask':
+            //$_POST['taskId']
+            break;
+        case 'completeTask':
+            break;
+    }
 }
 
 
 
- ?>
+
+?>
