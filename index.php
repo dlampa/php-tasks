@@ -1,7 +1,8 @@
 <!--
 Welcome to phpTasks, a rework of jsTasks with PHP as a backend in place of pure JS DOM manipulation.
 
-Layout and design has been inspired by services such as Trello, GMail, Microsoft To Do (Wunderlist), etc.
+Code absolutely needs refactoring and cleanup. But it does the job. Also, I need to figure out how to clear browser's POST data
+before initiating refresh in code. Had to use <form> submit instead 
 -->
 
 <?php
@@ -33,11 +34,12 @@ $_SESSION['last-requestId'] = uniqid();
         <!-- Data entry/task creation -->
         <section id="dataEntry">
             <!-- This time around we are using PHP, so action and method need to be updated appropriately -->
-            <form action="index.php" method="post">
+            <form action="index.php" method="post" requestId="<?php echo $_SESSION['last-requestId'] ?>">
                 <!-- Using a hidden input to set the action value -->
                 <input type="text" id="taskText" class="textEntry" name="taskText" title="Task description" placeholder="Add a task" />
                 <input type="number" id="taskEstDur" class="textEntry" name="taskEstDur" min="0" max="10" step="0.25" placeholder="&#xf017;" title="Estimated task duration (in hours, optional)" />
                 <button id="btnAddTask" title="Add the task to the Pending Tasks list." class="fas fa-plus"></button>
+                <button id="btnDeleteAll" title="Delete all tasks" class="fas fa-dumpster-fire"></button>
                 <label id="warningText" class="warningElement"></label>
                 <!-- Using a hidden input to specify the action for the 'reducer'. 
                 https://www.w3schools.com/tags/att_input_type_hidden.asp  -->

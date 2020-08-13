@@ -11,7 +11,10 @@ This is my first PHP app and is essentially a rework of the previous work, jsTas
 
 * Storing, manipulating and retrieving data from the $_SESSION global variable.
 
+* And much, much more...
+
 ## Live website
 
 You can see the live version of this project at the following [link](https://altx.dev/phptasks)
+(Link will be live sometime in the morning of Aug 13 2020.)
 

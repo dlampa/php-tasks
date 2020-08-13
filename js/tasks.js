@@ -2,11 +2,13 @@ const btnsStartTask = document.querySelectorAll('button[action="startTask"]');
 const btnsDeleteTask = document.querySelectorAll('button[action="deleteTask"]');
 const chksCompleteTask = document.querySelectorAll('input[name="completeTask"]');
 const btnsEditTask = document.querySelectorAll('button[action="editTask"');
+const btnDeleteAll = document.querySelector('#btnDeleteAll');
 
 btnsStartTask.forEach(button => button.addEventListener("click", event => actionHandler(event)));
 btnsDeleteTask.forEach(button => button.addEventListener("click", event => actionHandler(event)));
 chksCompleteTask.forEach(checkbox => checkbox.addEventListener("click", event => completeTask(event)));
 btnsEditTask.forEach(button => button.addEventListener("click", event => editActionHandler(event)));
+btnDeleteAll.addEventListener("click", (event) => deleteAll(event));
 
 // Inspired by : https://stackoverflow.com/questions/17809056/how-to-add-additional-fields-to-form-before-submit
 actionHandler = (event) => {
@@ -173,7 +175,6 @@ function processTaskEdit(event) {
     let currentLi = event.target.parentElement;
     let taskEditorElement = currentLi.querySelector("[name='txtTaskInplaceEdit']");
     let newTaskText = taskEditorElement.value;
-    let taskTimeDiv = currentLi.querySelector(".timeContainer");
 
     // Like in add task, it's necessary to check if the item already exists in the pending items list
     let arrTaskTexts = Array.from(lstPending.querySelectorAll("li h2")).map((element) => element.textContent);
@@ -235,9 +236,65 @@ function processTaskEdit(event) {
 
 }
 
+deleteAll = (event) => {
+    event.preventDefault();
+    // Create a temporary form and submit to backend
+    const parent = event.target.parentElement;
+    const tempForm = document.createElement("form");
+    const requestId = parent.getAttribute("requestId");
 
+    Object.assign(tempForm, {
+        method: "post",
+        action: "index.php",
+        hidden: true
+    });
 
+    const reqId = document.createElement("input");
+    Object.assign(reqId, {
+        type: "hidden",
+        name: "requestId",
+        value: requestId
+    });
 
+    const action = document.createElement("input");
+    Object.assign(action, {
+        type: "hidden",
+        name: "action",
+        value: "deleteAllTasks"
+    });
+
+   
+    tempForm.append(action);
+    tempForm.append(reqId);
+    parent.append(tempForm);
+    tempForm.submit();
+}
+
+// Error display
+function displayError(errorDesc, createWarnElement = false, parentContainer = null) {
+    // Reference to the warning element
+    let warningElement;
+
+    // Check if parentContainer is specified and createWarnElement is true - if so, create the warning element
+    if ((parentContainer != null) && createWarnElement) {
+        warningElement = document.createElement("label");
+        Object.assign(warningElement, {
+            classList: "warningElement"
+        });
+
+        parentContainer.append(warningElement);
+    }
+    else {
+        /* If both createWarnElement is false and parentContainer is null, select the warning text element in the 
+           the task description input form container */
+        warningElement = document.querySelector("form label.warningElement");
+    }
+
+    // Displays an error message errorDesc for 3 seconds in the #warningText element
+    clearTimeout(timeout);
+    warningElement.textContent = errorDesc;
+    timeout = setTimeout(() => { warningElement.textContent = ""; }, 3000);
+}
 
 
 submitToBackend = (action, requestId, uuid) => {

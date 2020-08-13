@@ -131,6 +131,11 @@ if ($_SESSION['last-requestId'] == $_POST['requestId']) {
             ));
 
             break;
+        case 'deleteAllTasks':
+            $_SESSION['pendingTaskList'] = [];
+            $_SESSION['activeTaskList'] = [];
+            $_SESSION['completedTaskList'] = [];
+            break;
     }
 }
 
