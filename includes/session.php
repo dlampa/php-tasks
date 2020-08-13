@@ -39,16 +39,58 @@ $_SESSION['completedTaskList'] = $_SESSION['completedTaskList'] ?? [];
 if ($_SESSION['last-requestId'] == $_POST['requestId']) {
 /* Actions on form submission - a kind of a 'reducer' */
     switch ($_POST['action']) {
-        case 'add':
+        case 'addTask':
+            // Create a new object with the relevant parameters, thereafter push to pendingTaskList array
             $newTask = new Todo($_POST['taskText'], $_POST['taskEstDur']);
             array_push($_SESSION['pendingTaskList'], $newTask);
-        
-            unset($_POST);
             break;
-        case 'delete':
+        case 'deleteTask':
+            // Go through all three arrays and delete the task if the uuid matches
+            $_SESSION['pendingTaskList'] = array_values(array_filter(
+                $_SESSION['pendingTaskList'], function($item) {
+                    return (!($item->uuid == $_POST['uuid']));
+                }
+            ));
+
+            $_SESSION['activeTaskList'] = array_values(array_filter(
+                $_SESSION['activeTaskList'],
+                function ($item) {
+                    return (!($item->uuid == $_POST['uuid']));
+                }
+            ));
+
+            $_SESSION['completedTaskList'] = array_values(array_filter(
+                $_SESSION['completedTaskList'],
+                function ($item) {
+                    return (!($item->uuid == $_POST['uuid']));
+                }
+            ));
+
             break;
         case 'startTask':
-            //$_POST['taskId']
+            /*  Similar approach to JS - isolate the Task based on uuid from the pendingTaskList array
+                Then, take the task and push to the array activeTaskList. Finally remove from pendingTaskList array.
+                Ref: https://www.php.net/manual/en/function.array-filter.php 
+                Need to revalue the keys, hence need to use the array_values()
+                Ref: https://stackoverflow.com/a/2653022/12802214
+                */
+            [$taskToStart] = array_values(array_filter(
+                $_SESSION['pendingTaskList'] , 
+                function($item) {
+                    return ($item->uuid == $_POST['uuid']);
+            } ));
+
+            // Add to the activeTaskList array
+            array_push($_SESSION['activeTaskList'], $taskToStart);
+
+            // Remove from the pendingTaskList array
+            $_SESSION['pendingTaskList'] = array_values(array_filter(
+                $_SESSION['pendingTaskList'], 
+                function($item) {
+                    return (!($item->uuid == $_POST['uuid']));
+                }
+            ));
+
             break;
         case 'completeTask':
             break;
