@@ -16,13 +16,12 @@ if (!isset($_SESSION)) {
 }
 
 require 'includes/session.php';
-include 'includes/head.php';
+include 'templates/head.php';
 
 // Store a request ID (any random value) and process request only if the requestID is consistent with the one passed down in $_POST.
 // This is to ensure that last POST is not reprocessed on refresh.
 // Ref: https://stackoverflow.com/a/38768140/12802214 (based on the concept in the link)
 $_SESSION['last-requestId'] = uniqid();
-
 
 ?>
 
@@ -34,46 +33,43 @@ $_SESSION['last-requestId'] = uniqid();
         <!-- Data entry/task creation -->
         <section id="dataEntry">
             <!-- This time around we are using PHP, so action and method need to be updated appropriately -->
-            <form action="index.php" method="post" requestId="<?php echo $_SESSION['last-requestId'] ?>">
+            <form action="index.php" method="post">
                 <!-- Using a hidden input to set the action value -->
                 <input type="text" id="taskText" class="textEntry" name="taskText" title="Task description" placeholder="Add a task" />
                 <input type="number" id="taskEstDur" class="textEntry" name="taskEstDur" min="0" max="10" step="0.25" placeholder="&#xf017;" title="Estimated task duration (in hours, optional)" />
-                <button id="btnAddTask" title="Add the task to the Pending Tasks list." class="fas fa-plus"></button>
-                <button id="btnDeleteAll" title="Delete all tasks" class="fas fa-dumpster-fire"></button>
                 <label id="warningText" class="warningElement"></label>
-                <!-- Using a hidden input to specify the action for the 'reducer'. 
-                https://www.w3schools.com/tags/att_input_type_hidden.asp  -->
-                <input type="hidden" name="action" value="addTask" />
                 <input type="hidden" name="requestId" value="<?php echo $_SESSION['last-requestId'] ?>" />
+                <button name="addTask" title="Add the task to the Pending Tasks list" class="fas fa-plus"></button>
+                <button name="deleteAllTasks" title="Delete all tasks" class="fas fa-dumpster-fire"></button>
             </form>
         </section>
-        <!-- Pending tasks -->
-        <!-- <section id="secPending" class="hidden"> -->
+
+        <!-- Pending tasks, show if not empty -->
         <section id="secPending" class="<?php echo empty($_SESSION['pendingTaskList']) ? 'hidden' : null ?>">
             <h1>Pending tasks</h1>
             <ul>
                 <?php
-                // Create the task element with all the basic buttons/etc. for interaction. JS will take care of the rest.
-                // This should have been a function
-                foreach ($_SESSION['pendingTaskList'] as $task) : ?>
-                    <li uuid="<?php echo $task->uuid ?>">
-                        <h2><?php echo $task->itemTask ?> </h2>
-                        <form method="post" action="index.php" requestId="<?php echo $_SESSION['last-requestId'] ?>">
-                            <button action="editTask" class="far fa-edit" title="Edit task details"></button>
-                            <button action="startTask" class="fas fa-running" title="Start the task"></button>
-                            <button action="deleteTask" class="far fa-trash-alt" title="Delete the task"></button>
-                        </form>
-                        <div class="timeContainer">
-                            <time class="creationTime" datetime="<?php echo $task->itemTimeCreated ?>" title="Time created">
-                                <?php echo Date('Y-M-d H:i', $task->itemTimeCreated) ?>
-                            </time>
-                            <?php if ($task->itemTimeComplEstimate != null) : ?>
-                                <time class="taskDurEstimate" title="Estimated task duration">
-                                    <?php echo $task->itemTimeComplEstimate ?>
+                    foreach ($_SESSION['pendingTaskList'] as $task) : ?>
+                        <li uuid="<?php echo $task->uuid ?>">
+                            <h2><?php echo $task->itemTask ?> </h2>
+                            <form method="post" action="index.php">
+                                <input type="hidden" name="uuid" value="<?php echo $task->uuid ?>" />
+                                <input type="hidden" name="requestId" value="<?php echo $_SESSION['last-requestId'] ?>" />
+                                <button name="editTask" class="far fa-edit" title="Edit task details"></button>
+                                <button name="startTask" class="fas fa-running" title="Start the task"></button>
+                                <button name="deleteTask" class="far fa-trash-alt" title="Delete the task"></button>
+                            </form>
+                            <div class="timeContainer">
+                                <time class="creationTime" datetime="<?php echo $task->itemTimeCreated ?>" title="Time created">
+                                    <?php echo Date('Y-M-d H:i', $task->itemTimeCreated) ?>
                                 </time>
-                            <?php endif; ?>
-                        </div>
-                    </li>
+                                <?php if ($task->itemTimeComplEstimate != null) : ?>
+                                    <time class="taskDurEstimate" title="Estimated task duration">
+                                        <?php echo $task->itemTimeComplEstimate ?>
+                                    </time>
+                                <?php endif; ?>
+                            </div>
+                        </li>
                 <?php endforeach; ?>
             </ul>
         </section>
@@ -88,8 +84,11 @@ $_SESSION['last-requestId'] = uniqid();
                     <li uuid="<?php echo $task->uuid ?>">
                         <input type="checkbox" name="completeTask" title="Mark task as completed" requestId="<?php echo $_SESSION['last-requestId'] ?>" />
                         <h2><?php echo $task->itemTask ?></h2>
-                        <form method="post" action="index.php" requestId="<?php echo $_SESSION['last-requestId'] ?>">
-                            <button action="deleteTask" class="far fa-trash-alt" title="Delete the task"></button>
+                        <form method="post" action="index.php">
+                            <input type="hidden" name="uuid" value="<?php echo $task->uuid ?>" />
+                            <input type="hidden" name="requestId" value="<?php echo $_SESSION['last-requestId'] ?>" />
+                            <input type="hidden" name="action" value="deleteTask" />
+                            <button name="deleteTask" class="far fa-trash-alt" title="Delete the task"></button>
                         </form>
                         <div class="timeContainer">
                             <time class="creationTime" datetime="<?php echo $task->itemTimeCreated ?>" title="Time created">
@@ -130,7 +129,10 @@ $_SESSION['last-requestId'] = uniqid();
                                 </p>
                             </aside>
                         <?php endif; ?>
-                        <form method="post" action="index.php" requestId="<?php echo $_SESSION['last-requestId'] ?>">
+                        <form method="post" action="index.php">
+                            <input type="hidden" name="uuid" value="<?php echo $task->uuid ?>" />
+                            <input type="hidden" name="requestId" value="<?php echo $_SESSION['last-requestId'] ?>" />
+                            <input type="hidden" name="action" value="deleteTask" />
                             <button action="deleteTask" class="far fa-trash-alt" title="Delete the task"></button>
                         </form>
                         <div class="timeContainer">

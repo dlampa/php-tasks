@@ -9,6 +9,10 @@
     box-sizing: border-box;
 }
 
+.sr-only {
+    display: none;
+}
+
 /* Entire page */
 html {
     padding: 15px;

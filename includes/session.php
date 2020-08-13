@@ -20,21 +20,17 @@
  *    - completion time
  */
 
-
-
 // Use null coalescing operator. Wasn't happy with all the ifs and issets. This is neater.
 // Ref: https://stitcher.io/blog/shorthand-comparisons-in-php
 $_SESSION['pendingTaskList'] = $_SESSION['pendingTaskList'] ?? [];
 $_SESSION['activeTaskList'] = $_SESSION['activeTaskList'] ?? [];
 $_SESSION['completedTaskList'] = $_SESSION['completedTaskList'] ?? [];
  
-//if ( !isset($_SESSION['pending-todo-list']) || empty($_SESSION['pending-todo-list']) ) { $_SESSION['pending-todo-list'] = array(); }
-
+// On startup, we won't have the last-requestId value, so just set to an empty string
+$_SESSION['last-requestId'] = $_SESSION['last-requestId'] ?? "";
 
 /*  Declare a new class Todo
     Ref: https://www.php.net/manual/en/language.oop5.basic.php */
-
-
 
 if ($_SESSION['last-requestId'] == $_POST['requestId']) {
 /* Actions on form submission - a kind of a 'reducer' */
@@ -97,7 +93,8 @@ if ($_SESSION['last-requestId'] == $_POST['requestId']) {
             break;
 
         case 'editTask':
-            $_SESSION['pendingTaskList'] = array_values(array_map(function($taskItem) {
+            $_SESSION['pendingTaskList'] = array_values(array_map(
+                function($taskItem) {
                 if ($taskItem->uuid == $_POST['uuid']) {
                     $taskItem->itemTask = $_POST['newTaskText'];
                     $taskItem->itemTimeEdited = time();
@@ -135,6 +132,9 @@ if ($_SESSION['last-requestId'] == $_POST['requestId']) {
             $_SESSION['pendingTaskList'] = [];
             $_SESSION['activeTaskList'] = [];
             $_SESSION['completedTaskList'] = [];
+            session_destroy();
+            // Page refresh to regenerate the sessionId - we've just destroyed it
+            header("refresh:0");
             break;
     }
 }

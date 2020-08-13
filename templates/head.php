@@ -14,8 +14,7 @@
     <link rel="stylesheet" href="css/fonts.css" />
     <link rel="stylesheet" href="css/colours.css" />
     <script src="https://kit.fontawesome.com/308aa213dc.js" crossorigin="anonymous"></script> <!-- Font Awesome Icons -->
-    <!-- <script src="js/todo.js" defer></script> -->
     <script src="js/tasks.js" defer></script>
 
-    <title>jsTasks</title>
+    <title>phpTasks</title>
 </head>
